@@ -1,0 +1,1387 @@
+---
+title: "Curso de Fatores"
+subtitle: "*Fatores Multiplicativos Fundamentados*"
+author: "Luiz Droubi"
+institute: Academia da Engenharia de Avaliações
+date: last-modified
+date-format: long
+title-slide-attributes:
+  data-background-image: img/PPT_abertura.png
+  #data-background-size: contain
+  #data-background-opacity: "0.5"
+  data-footer: "<a href='http://www.valoristica.com.br'>http://www.valoristica.com.br</a>"
+include-after-body: add-custom-footer.html
+lang: pt
+format:
+  revealjs:
+    theme: [default, style.scss]
+    logo: img/logo.png
+    # theme: beige
+    # smaller: true
+    scrollable: true
+    incremental: true
+    transition: slide
+    background-transition: fade
+fontsize: 1.8em
+bibliography: references.bib
+brand: true
+toc: true
+toc-depth: 1
+footer: "VALORÍSTICA"
+slide-number: true
+---
+
+```{r}
+#| include: false
+library(kableExtra)
+library(appraiseR)
+library(ggplot2)
+library(ggthemes)
+theme_set(theme_solarized(base_size = 15))
+library(ggtext)
+library(ggpmisc)
+library(patchwork)
+```
+
+```{r, eval = FALSE}
+set.seed(1)
+area <- rlnorm(n = 25, meanlog = 7, sdlog = .75)
+frente <- area/rlnorm(n = 25, meanlog = 3.5, sdlog = .5)
+#inclinacao <- rlnorm(n=25, meanlog = 1, sd = .75)
+pu <- 25000*area^-.25*frente^.10*inclinacao^-.10*rnorm(n=25, mean = 1, sd = .1)
+dados <- data.frame(PU = pu, Area = area, Frente = frente, 
+                    Incl = inclinacao)
+#dados$Frente[sample(1:25, 5)] <- NA
+dados$Frente[c(4, 13, 14, 19, 24)] <- NA
+#dados$Inclinacao[sample(1:25, 10)] <- NA
+dados$Incl[c(2, 3, 11, 13, 14, 17, 18, 20, 23, 24)] <- NA
+dados <- as.data.frame(apply(dados, 2, round, 2))
+```
+
+```{r}
+library(MASS)
+
+# Data parameters
+n <- 30
+m <- c(450, 15, 4, 2500)
+s <- c(175, 4, 3, 250)
+ryx1 <- -0.50; ryx2 <- -0.30; ryx3 <- -.40; rx1x2 <- .90; rx1x3 <- 0; rx2x3 <- 0
+
+sigma <- sqrt(log(s^2/m^2 + 1))
+mu <- log(m) - sigma^2/2
+rhoyx1 <- log(ryx1*prod(s[c(4, 1)])   / prod(m[c(4, 1)]) + 1)
+rhoyx2 <- log(ryx2*prod(s[c(4, 2)])   / prod(m[c(4, 2)]) + 1)
+rhoyx3 <- log(ryx3*prod(s[c(4, 3)])   / prod(m[c(4, 3)]) + 1)
+rhox1x2 <- log(rx1x2*prod(s[1:2])     / prod(m[1:2]) + 1)
+rhox1x3 <- log(rx1x3*prod(s[c(1, 3)]) / prod(m[c(1, 3)]) + 1)
+rhox2x3 <- log(rx2x3*prod(s[2:3]) / prod(m[2:3]) + 1)
+
+##                 Area         Frente        Incl.         #PU
+Sigma <- matrix(c(sigma[1]^2,    rhox1x2,    rhox1x3,     rhoyx1,  # Area
+                     rhox1x2, sigma[2]^2,    rhox2x3,     rhoyx2,  # Frente
+                     rhox1x3,    rhox2x3, sigma[3]^2,     rhoyx3,  # Incl.
+                      rhoyx1,     rhoyx2,     rhoyx3, sigma[4]^2   # PU
+                  ),         # Frente
+                ncol = 4, byrow = T)
+
+# Create data
+set.seed(1)
+dados <- exp(mvrnorm(n=n, mu=  mu, Sigma = Sigma,
+                     empirical = T))
+colnames(dados) <- c("Area", "Frente", "Incl", "PU")
+dados <- apply(dados, 2, round, 2)
+dados <- as.data.frame(dados)
+```
+
+```{r}
+# Impute NA's
+set.seed(2)
+dados$Incl[sample(1:25, 10)] <- NA
+dados$Frente[sample(1:25, 5)] <- NA
+
+# Adjust fit
+fit <- lm(log(PU) ~ log(Area) + log(Frente) + log(Incl), data = dados)
+AreaCoef <- coef(fit)["log(Area)"]
+FrenteCoef <- coef(fit)["log(Frente)"]
+```
+
+# Introdução {background-image="img/PPT_Chapter.png"}  
+
+## Sobre a arte de comunicar
+
+> Comunicação não é o que você fala, é o que o outro entende!
+
+- O Tratamento Científico trouxe **consistência** para a Engenharia de Avaliações
+
+- O Tratamento por Fatores, contudo, não deixou de ser utilizado
+  - Acredita-se que, em parte, isso se deve à clareza obtida com este tipo de 
+  tratamento
+
+- A consistência alcançada com o Tratamento Científico deu-se a custa de uma 
+perda na clareza da comunicação
+
+- É possível conciliar?
+  - @trivelloni2005;
+  - @Cerino2020;
+  - @droubi2021;
+  - @upav2024 e @valorem2024Augusto 
+  
+## Sobre a necessidade de Fatores
+
+- Há outra utilidade, além da clareza, na utilização do tratamento por fatores?
+
+- Na confecção de Plantas de Valores Genéricos (PVG):
+  - Ao elaborar PVG por face de quadra:
+  - Na fase de avaliação, ajustamos um modelo de regressão linear
+  - Depois, prevemos valores para os lotes paradigma em cada face de cada
+  quadra (*e.g.* 12x36$m^2$)
+  - Porém, esta PVG precisa ser utilizada para prever valores dos lotes reais
+  da cidade, que tem características que podem ser diferentes das do lote
+  paradigma
+  - Ao calcular o valor dos lotes reais, precisamos ajustar os valores de
+  face de quadra para as características reais dos lotes
+  - Ao comunicar à população o motivo das diferenças nas avaliações de cada
+  imóvel, os fatores são uma boa pedida
+
+## Sobre a necessidade de Fatores
+
+- Nas avaliações pontuais:
+  - Ao realizar uma avaliação imobiliária, nos deparamos com variáveis 
+  incompletas, mas que deveriam ser utilizadas. Por exemplo:
+    - A elasticidade das ofertas em relação aos preços, nas avaliações 
+    imobiliárias em geral, urbanas ou rurais;
+    - O andar em que se situa o imóvel, na avaliação de um apartamento;
+    - A pedologia do solo, ao avaliar um lote para construção/incorporação.
+    
+- Que bom seria se sempre tivessemos informações completas e claras sobre os
+imóveis
+  - Mas então não precisaríamos de avaliadores!
+
+# Origem dos Fatores Multiplicativos {background-image="img/PPT_Chapter.png"}  
+
+## Qual a origem dos fatores multiplicativos?
+
+- A  utilização de fatores multiplicativos parece ser mais intuitiva do que a 
+aplicação de fatores aditivos
+
+- Ao colocar o seu imóvel à venda é natural comparar o seu imóvel a um imóvel
+parecido que tenha sido recentemente vendido
+
+- Se um apartamento foi vendido no seu prédio, com características praticamente
+  idênticas às do seu apartamento
+  - Imaginemos que essa venda tenha se dado ao valor de mercado do apartamento
+  - Qual a oferta mínima pelo seu apartamento você estaria disposto a aceitar?
+  
+## Qual a origem dos fatores multiplicativos? (2)
+
+- Comparando com o apartamento do seu vizinho, você faz as seguintes observações:
+  - O seu apartamento situa-se numa posição mais privilegiada no edifício
+    - Por exemplo, uma posição solar mais favorável
+    - Ou um andar mais alto
+
+- Um apartamento situado em uma fachada mais favorável (ou em um andar mais alto)
+deve ter um valor um pouco superior a um apartamento com as mesmas
+características, porém situado em uma fachada desfavorável (ou em um andar mais
+baixo).
+  - O quão superior é que são elas!!!
+  
+## Qual a origem dos fatores multiplicativos? (3)
+
+- Se pensarmos em R$ 20.000,00 a mais por um apartamento de mesmas 
+características, porém situado numa fachada mais favorável, isto é pouco ou é
+muito?
+  - Se o valor de venda do apartamento similar foi R$ 200.000,00, então isto 
+  equivale a 10,0% a mais, o que é relevante;
+  - Porém, se o valor de venda do apartamento similar foi R$ 2.000.000,00,
+  R$ 20.000,00 é praticamente insignificante (1,0%)!
+  
+- Se pensarmos em um valor 10% maior para um apartamento de mesmas 
+características, porém em situação mais privilegiada, temos:
+  - Apartamento de R\$ 200.000,00: R\$ 20.000,00 a mais!
+  - Apartamento de R\$ 500.000,00: R\$ 50.000,00 a mais!
+  - Apartamento de R\$ 900.000,00: R\$ 90.000,00 a mais!
+  
+## Qual a origem dos fatores multiplicativos? (3)
+
+- Se olharmos pela ótica do comprador, a situação é ainda mais clara?
+  - Se você está procurando um apartamento para comprar e se depara com duas 
+  oportunidades:
+    - Um apartamento ao preço de R$ 200.000,00;
+    - Outro apartamento no mesmo edifício, porém em posição mais favorável, 
+    por R$ 220.000,00;
+      - A sua escolha irá depender da sua preferência!
+        - Ambos os apartamentos estão corretamente precificados
+        
+## Qual a origem dos fatores multiplicativos? (4)
+
+- Porém, se você se depara com duas ofertas:
+  - Um apartamento ao preço anunciado de R$ 2.000.000,00;
+  - Outro ap. no mesmo edifício, em posição mais favorável, por 
+  R$ 2.020.000,00;
+  - Obviamente você irá optar pelo segundo, pois a diferença de preço é mínima
+  e, por apenas 1% a mais você poderá desfrutar de um apartamento melhor
+    - Os apartamentos não estão bem precificados
+
+- Numa negociação, é comum a situação:
+  - Oferta de R$ 1,8 mi pelo ap. situado em posição solar desfavorável;
+  - E justificar a proposta assim:
+    - "Tem um apartamento ao lado, com fachada norte, por R$ 2.020.000,00."
+  - A questão é que o preço do melhor é que pode estar com desconto
+    - Por isso precisamos de avaliadores!
+    
+## Qual a origem dos fatores multiplicativos? (5)
+
+- Se eu estou certo, um *Fator posição solar* deverá se apresentar na forma:
+  - $$F_{PS} = \frac{PS_i}{PS_{paradigma}} = \begin{cases}
+  1,0 &\text{ se } PS_i = \text{Neutra}       \\
+  1,1 &\text{ se } PS_i = \text{Favorável}    \\
+  0,9 &\text{ se } PS_i = \text{Desfavorável}
+  \end{cases}
+  $$
+  
+- Se o valor de mercado de um apartamento numa fachada neutra é R$ 1.000.000,00
+  - Então o valor de um apartamento similar, porém em fachada favorável será:
+    - $$P_i = \overline P_{Hom}\cdot F_{PS} = 1.000.000,00 \cdot 1,1 = \text{R\$} 1.100.000,00$$
+    
+    
+# Utilização de Fatores Multiplicativos {background-image="img/PPT_Chapter.png"}  
+
+## Como utilizar fatores multiplicativos
+
+- Para homogeneizar valores [@lima2006]:
+  - $$P_{Hom_i} = \frac{P_{Obs_i}}{F_{1i} \cdot F_{2i} \cdot \ldots \cdot F_{ki} }$${#eq-Homogeneizar}
+  
+- Exemplo:
+  - Um imóvel $i$ da amostra conta com área e frente diferentes do avaliando
+    - Primeiro precisamos homogeneizar este elemento em relação ao avaliando:
+      - $$PU_{Hom_i} = \frac{PU_i}{F_{Area} \cdot F_{frente}}$$
+    - Então, uma vez efetuada a homogeneização, todos os valores homogeneizados
+    serão utilizados para o cômputo de um $\overline{PU}_{Hom}$, que será 
+    utilizado para estimar o valor de mercado do avaliando
+  
+## Como utilizar fatores multiplicativos
+
+- Para prever valores [@lima2006]:
+  - $$\hat P_i =  \overline{P}_{Hom} \cdot F_{1i} \cdot  F_{2i} \cdot \ldots \cdot F_{ki}$${#eq-Prever}
+  
+
+## Fator Área de Abuhnaman
+
+- Fator área de Abuhnaman (adaptado):
+  $$F_{A} = \left( \frac{A_i}{A_{paradigma}} \right)^{-1/4}$$
+  
+- Exemplo:
+  - $A_{paradigma} = 360m^2$
+  - $A_i = 400m^2$
+  - $P_i = \text{R\$ }500.000,00$
+  - $F_{Ai} = \left (\frac{400}{360} \right)^{-1/4} \approx 0,9306$
+  - $P_{Hom_i} = P_i/F_{Ai} = 500.000,00 /0,9306 =  \text{R\$ } 537.285$
+    - Se a área do imóvel fosse igual a 360$m^2$, então seu preço seria maior!
+    
+- Também é um fator multiplicativo!
+  - De onde vem isto?
+
+## Qual a origem dos fatores multiplicativos?
+
+```{r}
+#| label: fig-BasicFit
+#| fig-cap: "Resíduos vs. valores ajustados para um modelo aditivo."
+# data("zilli_2020")
+Zilli2020 <- readxl::read_xls("./data/zilli_2020.xls")
+Zilli2020 <- within(Zilli2020,{
+  PC <- factor(PC, levels = c("Baixo", "Médio", "Alto"))
+  BRO <- factor(BRO)
+  PSN <- factor(PSN)
+  MO <- factor(MO)
+  CH <- factor(CH)
+})
+fitZilli <- lm(PU ~ PC + NG + DABM + AP , data = Zilli2020)
+plot(fitZilli, which = 1)
+```
+
+
+## *Cobb-Douglas*
+
+- Na econometria é muito conhecida a Função de *Cobb-Douglas* 
+  - Na sua forma mais simples:
+    - $$Y = a.X^b$$
+- É possível linearizar a função de *Cobb-Douglas*:
+  - $$\ln(Y) = \ln(a) + b.\ln(X)$$
+- O que torna fácil estimar a regressão:
+  - $$\ln(Y) = \beta_0 + \beta_1.\ln(X) + \varepsilon$$
+- Uma vez estimado o modelo de regressão acima, pode-se obter $\hat a$ e $\hat b$:
+
+:::: {.columns}
+::: {.column width="50%"}
+
+- $$\hat a = \exp(\hat \beta_0);\, \hat b = \hat\beta_1$$
+
+:::
+
+::: {.column width="50%"}
+
+- $$Y = \hat a X^{\hat b}$$
+
+:::
+::::
+  
+## *Cobb-Douglas* (2)
+
+- A linearização está centrada na hipótese de que o erro $\xi$ é **multiplicativo**:
+  - $$Y = \hat a X^{\hat b}\cdot \xi$$
+  - $$\xi = \exp (\hat \varepsilon) = \frac{Y}{\hat aX^\hat b}=\frac{Y}{\hat Y}$$
+  
+- Explicação:
+  - $$\begin{aligned}
+  \ln(Y) &= \ln(\hat a) + b\cdot \ln(X) + \hat \epsilon \\
+  \exp[\ln(Y)] &= \exp[\ln(a) + b\cdot \ln(X) + \hat \epsilon]\\
+  Y &= \exp[\ln(\hat a)] \cdot \exp[b\cdot\ln(X)] \cdot \exp(\hat \epsilon)\\
+  Y &= \hat a \cdot X^{\hat b} \cdot \exp(\hat \epsilon)\\
+  \exp(\hat \epsilon) &= \frac{Y}{\hat a \cdot X^{\hat b}} 
+  \end{aligned}$$
+
+## *Cobb-Douglas* (3) {.smaller}
+
+-   A hipótese de que o erro é aditivo pode não ser verificada no mercado imobiliário:
+
+. . .
+
+```{r}
+#| label: residuosAditivos
+#| fig-cap: "Termo de erro aditivo."
+library(ggResidpanel)
+fit1 <- lm(PU ~ BRO + PC + I(NG-1) + log(DABM/100) + log(AP/100),
+          data = Zilli2020, subset = -204)
+#olsrr::ols_plot_resid_stud_fit(fit1, threshold = 2.5)
+resid_panel(fit1)
+```
+
+## *Cobb-Douglas* (4) {.smaller}
+
+```{r}
+#| label: residuosMultiplicativos
+#| fig-cap: "Termo de erro multiplicativo"
+fit2 <- update(fit1, log(PU) ~.)
+# olsrr::ols_plot_resid_stud_fit(fit2, threshold = 2.5)
+resid_panel(fit2)
+```
+
+-   A hipótese dos erros multiplicativos parece mais adequada!
+
+## *Cobb-Douglas* (5) {.smaller}
+
+```{r}
+# Data parameters
+n <- 60
+m <- c(450, 7500)
+s <- c(250, 1250)
+ryx <- -0.70
+
+sigma <- sqrt(log(s^2/m^2 + 1))
+mu <- log(m) - sigma^2/2
+rhoyx <- log(ryx*prod(s[c(2, 1)])   / prod(m[c(2, 1)]) + 1)
+
+##                 Area             #PU
+Sigma <- matrix(c(sigma[1]^2,     rhoyx,  # Area
+                      rhoyx, sigma[2]^2   # PU
+                  ),    
+                ncol = 2, byrow = T)
+
+# Create data
+set.seed(2)
+df <- exp(mvrnorm(n=n, mu=  mu, Sigma = Sigma,
+                     empirical = T))
+colnames(df) <- c("Area", "PU")
+df <- apply(df, 2, round, 2)
+df <- as.data.frame(df)
+```
+
+```{r}
+#| label: nlsFit
+#| fig-cap: "Dados para exemplificar a equação de Cobb-Douglas."
+ggplot(df, aes(x = Area, y = PU)) +
+  geom_point() +
+  stat_smooth(method="nls", se=FALSE, formula=y~a*log(x/450) + k,
+              method.args=list(start=c(a=-100, k=10000))) +
+  stat_poly_line(color = "red", lty = 2, se = FALSE) +
+  labs(title = "<b style='color:red'>Modelo Linear</b> e 
+  <b style='color:blue'>Modelo Não-Linear</b>") +
+  theme(plot.title = element_markdown(lineheight = 1.1))
+```
+
+## *Cobb-Douglas* (6)
+
+```{r}
+#| fig-width: 9
+#| fig-height: 4.5
+ggplot(df, aes(x = Area, y = PU)) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2")), label.x = "right", color = "blue",
+               size = 7) +
+  scale_y_continuous(transform = "log") +
+  scale_x_continuous(transform = "log", breaks = scales::log_breaks()) +
+  labs(title = "Modelo linearizado", caption = "Eixos na escala logarítmica")
+```
+
+-   $a = \exp(10,4) \approx 32.860,00;\, b \approx -0,25$
+
+-   $PU = 32.860,00.Area^{-0,25}$
+
+# Centralização de Dados {background-image="img/PPT_Chapter.png"}  
+
+## Justificativa
+
+- O valor de $\hat\beta_0$ não apresenta significado físico:
+  - Não existe lote com $0m^2$ de área
+
+- A equação de estimação, portanto, fica com a interpretação um tanto prejudicada
+- Isto pode ser contornado facilmente, contudo.
+  - Basta centralizar a variável explicativa em relação à suas média (ou ao
+  valor do imóvel avaliando)
+    - Por exemplo, se o lote avaliando apresenta área de  ($360m^2$)  
+    - No exemplo acima, se ao invés de utilizarmos a área do lote como variável 
+    explicativa, utilizarmos a área do lote dividida por 360, teremos:
+    - $$\ln(PU) = \beta_0 + \beta_1\cdot \ln(Area/360) + \epsilon$$
+
+## Justificativa (2) 
+
+- $$\ln(PU) = \beta_0 + \beta_1\cdot \ln(Area/360) + \epsilon$$
+  - Assim, quando a área do lote for igual a $360m^2$, então:
+    - $\ln(Area/360) = \ln(360/360) = \ln(1) = 0$
+    - $\widehat{PU} = \hat\beta_0$, ou seja, $\hat\beta_0$ irá representar 
+    $\widehat{PU}$ de um lote com $360 m^2$ de área
+
+- Em termos estatísticos, tanto faz utilizar uma variável explicativa $x$ ou 
+uma transformação linear ($x_{center} = (x - a)/b$) dela
+  - De fato, é muito comum entre os estatísticos fazer, para cada $X_i$:
+    - $$X_{ic} = \frac{X_i - \overline X_i}{SD(X_i)}$$
+    - Isto é conhecido como padronização de variáveis!
+  - $R^2$ será o mesmo, os $\hat\beta_i$ serão os mesmos, apenas $\hat\beta_0$ 
+  se modifica
+  
+    
+## *Cobb-Douglas* (7)
+
+```{r}
+#| fig-width: 9
+#| fig-height: 4.5
+ggplot(df, aes(x = Area/360, y = PU)) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2")), label.x = "right", color = "blue",
+               size = 7) +
+  geom_segment(x = 0, xend = 0, y=0, yend = log(7560), color = "red", size=1.5) +
+  geom_segment(x = 0, xend = -1, y=log(7560), x=log(7560), 
+               color = "red", size=1.5) +
+  scale_y_continuous(transform = "log") +
+  scale_x_continuous(transform = "log", breaks = scales::log_breaks()) +
+  labs(title = "Modelo Linearizado", 
+       caption = "Eixos na escala logarítmica. Variável Área centralizada.")
+```
+
+-   $a = \exp(8,93) \approx 7.560,00;\, b \approx -0,25$
+
+-   $PU = 7.560\cdot\left (\frac{Area}{360} \right )^{-0,25} =  7.560\cdot\left (\frac{360}{Area} \right )^{+0,25}$
+
+## Derivação do Fator Área
+
+- $$PU = 7.560\cdot\left (\frac{360}{Area} \right )^{+0,25}$${#eq-Modelo1}
+
+- Com o modelo da @eq-Modelo1 é fácil derivar:
+  - O fator área ($F_S$):
+    - $$F_S = \left ( \frac{360}{Area}\right) ^{0,25}$$
+      - É fácil ver que:
+        - Quando $Area = 360m^2$, $F_S = 1$
+        - Quando $Area > 360$, então $F_S < 1,0$
+        - Quando $Area < 360$, então $F_S > 1,0$
+  - $\overline{PU}_{Hom} = \exp(\hat\beta_0)$ (se a variável explicativa estiver centralizada!)
+    
+## Aplicação do Fator Área
+
+- Para homogeneização:
+  - Imóvel da amostra com $440 m^2$ e $PU = \text{ R\$ }7.000/m^2$:
+    - $F_S = (360/440)^.25 \approx 0,95$
+    - $PU_{Hom} = 7.000/0,95 \approx \text{ R\$ } 7.368,00/m^2$
+    
+- Para a avaliação:
+  - Imóvel avaliando com $250m^2$, em amostra com $\overline{PU}_{Hom} = 7.560$:
+    - $F_S = (360/250)^{0,25} = 1,0955$
+    - $PU_{aval} = 7.560 \cdot 1,0955 \approx 8.280,00$
+
+# Múltiplos Fatores Multiplicativos {background-image="img/PPT_Chapter.png"}  
+
+## *Cobb-Douglas*
+
+- É muito bem difundida entre os economistas a seguinte função de produção de 
+*Cobb-Douglas*:
+  - $Q(L, K) = A\cdot L^{\beta}\cdot K^{\alpha}$
+    - $A>0$ é uma constante
+    - $L$ é o fator Trabalho
+    - $K$ é o fator capital
+    - $\alpha$ e $\beta$ são coeficientes que dependem da indústria
+    - $Q$ é a quantidade produzida, função de $L$ e $K$
+      
+- Como fazem os economistas para estimar $A$, $\alpha$ e $\beta$:
+  - $$\begin{aligned}
+  \ln(Q) = \ln(A\cdot L^{\beta}\cdot K^{\alpha})\\
+  \ln(Q) = \ln(A) + \ln(L^{\beta}) + \ln(K^{\alpha})\\
+  \ln(Q) = \ln(A) + \beta\ln(L) + \alpha \ln(K)
+  \end{aligned}$$
+  
+## Cobb-Douglas
+
+- Da mesma forma, portanto, temos um modelo de regressão do tipo:
+  $$\widehat{\ln(PU)} = \hat\beta_0 + \hat\beta_1 \ln(L) + \hat\beta_2 \ln(K)$$
+- Uma vez estimados $\hat\beta_0$, $\hat\beta_1$ e $\hat\beta_2$, temos:
+  - $A = \exp(\hat\beta_0)$
+  - $\beta = \hat\beta_1$
+  - $\alpha = \hat\beta_2$
+  
+## Derivação de Fatores em Modelos **RLM**
+
+- Nos modelos multiplicativos de regressão linear múltipla (**RLM**), temos:
+    - $$\ln(PU) = \beta_0 + \beta_1\ln(X_1) + \beta_2\ln(X_2) + \ldots + \beta_k \ln(X_k) + \varepsilon$$
+
+- Centralizando estes modelos, teremos:
+    - $$\ln(PU) = \beta_0^* + \beta_1\ln\left (\frac{X_1}{c_1} \right ) + \beta_2\ln \left(\frac{X_2}{c_2} \right ) + \ldots + \beta_k \ln \left (\frac{X_k}{c_k} \right ) + \varepsilon$$
+
+- Estimando o modelo da equação acima, obtemos a eq. de Estimação:
+    - $$\widehat{PU} = \exp(\hat\beta_0^*)\cdot (X_1/c_1)^{\hat\beta_1}\cdot (X_2/c_2)^{\hat\beta_2} \cdot \ldots \cdot (X_k/c_k)^{\hat\beta_k}\cdot \exp(\varepsilon)$$
+  
+. . .
+
+:::: {.columns}
+::: {.column width="33%"}
+
+  - $\overline{PU}_{Hom} = \exp(\hat\beta_0^*)$
+  - $F_1 = (X_1/c_1)^{\hat\beta_1}$
+:::
+
+::: {.column width="33%"}
+
+  - $F_2 = (X_2/c_2)^{\hat\beta_2}$
+  - $\ldots$
+
+:::
+
+::: {.column width="33%"}
+
+  - $F_k = (X_k/c_k)^{\hat\beta_k}$
+  
+:::
+::::
+
+# Exemplo 1 {background-image="img/PPT_Chapter.png"}  
+
+## Dados
+
+- @zeni2024:
+
+. . . 
+
+::::: columns
+::: {.column width="50%"}
+
+```{r}
+data("zeni_2024a")
+kable(head(zeni_2024a, n = 11), digits = 2,
+      format.args = list(decimal.mark = ",", big.mark = ".")
+      ) |>
+  kable_styling(font_size = 26)
+```
+
+:::
+
+::: {.column width="50%"}
+
+
+```{r}
+kable(tail(zeni_2024a, n = 10), digits = 2, 
+      format.args = list(decimal.mark = ",", big.mark = ".")
+      ) |>
+  kable_styling(font_size = 26)
+```
+
+:::
+:::::
+
+
+## Análise Exploratória
+
+```{r}
+plotdf(PU ~ A + D, data = zeni_2024a)
+```
+
+## Análise Exploratória
+
+```{r}
+library(lattice)
+histogram(~PU, data = zeni_2024a)
+```
+
+## Análise Exploratória
+
+```{r}
+histogram(~log(PU), data = zeni_2024a)
+```
+
+## Análise Exploratória
+
+```{r}
+plotdf(log(PU) ~ log(A) + log(D), data = zeni_2024a)
+```
+
+## Ajuste do Modelo
+
+```{r}
+fit <- lm(log(PU) ~ log(A) + log(D), data = zeni_2024a)
+S(fit)
+```
+
+## Aparte: Resíduos Parciais
+
+- Em um modelo de regressão linear, temos:
+  $$Y = \beta_0 + \beta_1 X_1 + \cdots + \beta_k X_k + \varepsilon$$
+  
+- Os resíduos totais, portanto, são:
+  $$\begin{aligned}
+  \hat \varepsilon &= Y - (\hat\beta_0 + \hat\beta_1 X_1 + \cdots + \hat\beta_k X_k)\\
+  \hat \varepsilon &= Y - \hat Y
+  \end{aligned}$$
+  
+- Para obter resíduos parciais em relação a uma variável explicativa, retornamos
+o efeito dela à equação acima:
+  - $\hat\varepsilon_1 = Y - \hat Y + \hat \beta_1 X_1$
+  - $\hat\varepsilon_2 = Y - \hat Y + \hat \beta_2 X_2$
+  - ...
+  - $\hat\varepsilon_k = Y - \hat Y + \hat \beta_k X_k$
+  
+
+
+## Plotagem do Modelo
+
+- Os resíduos parciais são úteis para serem plotados contra as variáveis 
+explicativas:
+
+. . . 
+
+
+```{r}
+plotModel(fit, residuals = T)
+```
+
+## Novo Modelo
+
+```{r}
+fit1 <- update(fit, .~. - log(D) + D)
+S(fit1)
+```
+
+- Note-se o aumento do grau de ajuste do modelo!
+
+## Plotagem do Novo Modelo
+
+```{r}
+plotModel(fit1, residuals = T)
+```
+
+## Centralização dos Dados
+
+- $A = 11.000$ (mediana da variável Área)
+- $D = 980$ (moda da variável Distância)
+
+. . . 
+
+### Modelo Centralizado
+
+```{r}
+fitCenter <- lm(log(PU) ~ log(A/11000) + I(D-980), data = zeni_2024a)
+S(fitCenter)
+```
+
+- $\overline{PU}_{Hom} = \exp(4,82) \approx \text{ R\$ }124,0/m^2$
+
+## Derivação de Fatores
+
+::::: columns
+::: {.column width="35%"}
+
+- Fator Área ($F_S$):
+- $F_S = (11.000/A)^{0,35}$
+  
+:::
+
+::: {.column width="65%"}
+
+- Fator Distância ($F_D$):
+- $F_D = \exp(-5.10^{-3}(D - 980)) = 0,9995^{(D - 980)}$
+
+:::
+::::
+
+- Qual o valor de um lote com 10.000$m^2$ situado a uma distância de 100m?
+
+. . . 
+
+::::: columns
+::: {.column width="40%"}
+
+- Previsão a partir dos fatores:
+- $F_S = (11.000/A_i)^{0,35}$ 
+- $F_S = (11.000/10.000)^{0,35}$
+- $F_D = 0,9995^{(D_i - 980)}$
+- $F_D = 0,9995^{(100 - 980)}$
+- $\widehat{PU} = \overline{PU}_{Hom} \cdot F_S \cdot F_D$
+- $\widehat{PU} = 124,0\cdot 1,034 \cdot 1,55$ 
+- $\widehat{PU} \approx \text{R\$ } 200,0/m^2$
+
+:::
+
+::: {.column width="60%"}
+
+
+
+
+```{r}
+#| echo: false
+p <- predict(fitCenter, 
+             newdata = list(A = 10000, D = 100))
+```
+
+- Previsão a partir do modelo:
+- $\widehat{\ln(PU)} = 4,82 - 0,35\ln(,91) - 5.10^{-3}.880$
+- $\widehat{\ln(PU)} =$ `r brf(p)`
+- $\widehat{PU} \approx \exp(5,30)$
+- $\widehat{PU} \approx \text{R\$ } 200,0/m^2$
+- OK!
+
+:::
+::::
+
+# Outros tipos de variáveis explicativas {background-image="img/PPT_Chapter.png"}  
+
+## Outras variáveis
+
+- Variáveis dicotômicas
+  - As variáveis dicotômicas são variáveis do tipo 0/1
+    - Usualmente: não (0)/ sim (1)
+    - Exemplo:
+      - Prédio com elevador? não/sim (0/1)
+      
+- As variáveis dicotômicas não sofrem transformações
+
+- Um modelo que inclui uma variável dicotômica ($X_2$) será do tipo:
+  - $$\ln(PU) = \beta_0 + \beta_1 \ln(X_1) + \beta_2 X_2 + \varepsilon$$
+
+## Outras variáveis (2)
+
+- Um modelo que inclui uma variável dicotômica ($X_2$) será do tipo:
+  - $$\ln(PU) = \beta_0 + \beta_1 \ln(X_1) + \beta_2 X_2 + \varepsilon$$
+  - Portanto, a sua equação de estimação será:
+    - $$\hat{PU} = \exp(\hat\beta_0) \cdot X_1^{\hat \beta_1} \cdot \exp(\hat \beta_2\cdot X_2)$$
+    - Como $\exp(k.X) = \exp(k)^X \rightarrow \exp(\hat \beta_2\cdot X_2) = \exp(\hat\beta_2)^{X_2}$, então:
+    - $$PU = \exp(\hat \beta_0) \cdot X_1^{\hat \beta_1} \cdot \exp(\hat \beta_2)^{X_2}$$
+      - Ou seja, se:
+        - $X_2 = 0 \rightarrow \exp(\hat\beta_2)^{X_2} = \exp(\hat\beta_2)^{0} = 1$
+        - $X_2 = 1 \rightarrow \exp(\hat\beta_2)^{X_2} = \exp(\hat\beta_2)^{1} = \exp(\hat\beta_2)$
+        
+## Outras variáveis (3)
+
+- No caso de variáveis numéricas contínuas, sem transformação, tais como:
+  - Quartos ($Q$), com valores possíveis igual a $\{1, 2, 3, 4, ...\}$;
+  - Vagas de Garagens ($G$), com valores possíveis igual a $\{0, 1, 2, 3, ...\}$;
+  - Padrão Construtivo ($PC$) com códigos alocados ou dicotomia em grupo;
+  - Vale o mesmo raciocínio das variáveis dicotômicas!
+  
+- Exemplo - $X_1 = \text{Area}$, $X_2 = \text{Elevador}$, $X_3 = G$:
+  - $$PU = \exp(\hat \beta_0) \cdot \exp(\hat \beta_2)^\text{Elevador} \cdot \exp(\hat \beta_3)^G$$
+  - Se $G = 0 \rightarrow \exp(\hat \beta_3)^0 = 1$
+  - Se $G = 1 \rightarrow \exp(\hat\beta_3)^1 = \exp(\hat\beta_3)$
+  - Se $G = 2 \rightarrow \exp(\hat\beta_3)^2$
+  - Se $G = n \rightarrow \exp(\hat\beta_3)^n$
+  
+## Outras variáveis (4)
+  
+- E se ao ajustar o modelo **RLM** for utilizada a transformação $\sqrt{G}$
+(ou $G^2$, ou qualquer outra transformação, excetuando-se $\ln(G)$):
+  - $$PU = \exp(\hat \beta_0) + \exp(\hat \beta_2)^\text{Elevador} + \exp(\hat \beta_3)^{\sqrt{G}}$$
+  - Se $G = 0 \rightarrow \exp(\hat \beta_3)^{\sqrt{0}} = 1$
+  - Se $G = 1 \rightarrow \exp(\hat\beta_3)^{\sqrt{1}} = \exp(\hat\beta_3)$
+  - Se $G = 2 \rightarrow \exp(\hat\beta_3)^{\sqrt{2}} = \exp(\hat\beta_3)^{1,414}$
+  - Se $G = n \rightarrow \exp(\hat\beta_3)^{\sqrt{n}} = \exp(\hat\beta_3)^{1,732}$
+  
+## Outras variáveis (5)
+
+- Para a dicotomia em grupo, vale tudo que se aplica à dicotomia simples:
+  - Não cabem transformações das variáveis dicotômicas em grupo!
+  - Os fatores serão obtidos através da exponenciação dos coeficientes
+  - A variável passa a ser expoente de $\exp(\hat\beta_i)$
+  
+## Outras variáveis (6)
+
+- Assim como é comum utilizar variáveis dicotômicas para testar a alteração dos
+níveis de preços entre um período e outro, ou entre um bairro e outro, etc.
+
+- É possível utilizar a *dicotomia em grupo* para testar a alteração dos níveis
+de preços entre 3 ou mais períodos, ou 3 ou mais bairros, etc.
+
+- Na dicotomia em grupo são criadas $g-1$ variáveis para simular os $g$ grupos
+existentes.
+  - Quanto há apenas 2 grupos, cria-se apenas uma variável e a dicotomia em 
+  grupo degenera para a dicotomia simples
+  - Quando há 3 grupos, deve-se criar 2 variáveis dicotômicas
+  - Quando há 4 grupos, deve-se criar 3 variáveis dicotômicas
+  - Etc.
+  
+## Outras variáveis (7)
+
+- Na dicotomia em grupo, portanto, teremos $g-1$ coeficientes que medem a 
+diferença de preços entre o grupo de referência e o grupo em análise.
+
+- Por exemplo:
+  - A variável *PC* representa o Padrão Construtivo, com 3 níveis:
+    - *B* para Padrão Baixo;
+    - *M* para Padrão Médio;
+    - *A* para Padrão Alto.
+  - O nível de referência pode ser qualquer um dos três níveis. Por exemplo, se
+  escolhemos como referência o nível *B*, teremos duas variáveis explicativas:
+    - *PCM*, que irá representar os imóveis de Padrão Médio e;
+    - *PCA*, que irá representar os imóveis de Padrão Alto;
+
+- Na matriz do modelo, estas duas variáveis serão dicotômicas (0/1).
+  
+## Outras variáveis (8)
+
+
+
+- Ex. [@zilli2020]:
+
+. . . 
+
+:::: {.columns}
+::: {.column width="40%"}
+
+```{r}
+head(model.matrix(fitZilli), n = 18)
+```
+
+:::
+
+::: {.column width="60%"}
+
+
+```{r}
+S(fitZilli)
+```
+
+
+:::
+::::
+
+- Coeficientes das variáveis dicotômicas representam a **diferença** entre o 
+*PU* do *PC* de referência (Baixo) em relação aos *PCM* e *PCA*!
+
+# Exemplo 2
+
+## Dados
+
+```{r}
+kable(head(Zilli2020, n = 10), 
+      digits = 2, format.args = list(decimal.mark = ",", big.mark = ".")
+      )
+```
+
+
+## Análise Exploratória
+
+```{r}
+plotdf(PU ~ PC + NG + AP + DABM, data = Zilli2020)
+```
+
+- Reparem na relação entre *PU* e *AP*!
+
+## Análise Exploratória
+
+```{r}
+plotdf(log(PU) ~ PC + NG + AP + DABM, data = Zilli2020)
+```
+
+- Reparem na relação entre $\ln(PU)$ e *AP*!
+
+## Ajuste do Modelo **RLM**
+
+```{r}
+fitZilliLog <- update(fitZilli, log(PU) ~ PC + I(NG -1) + I(DABM - 100) + I(AP - 100))
+S(fitZilliLog)
+```
+
+## Plotagem do Modelo
+
+```{r}
+plotModel(fitZilliLog, residuals = T)
+```
+
+- Reparem em como a relação entre *AP* e $\ln(PU)$ se modificou! 
+
+
+## Derivação do Fator *PC*
+
+:::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+S(fitZilliLog, brief = T)
+```
+
+:::
+
+::: {.column width="50%"}
+
+
+
+- $\exp(\hat\beta_{PCM}) = \exp(0,2655) \approx 1,30$
+- $\exp(\hat\beta_{PCA}) = \exp(0,46075) \approx 1,59$
+- $F_{PC} = \begin{cases}
+  1,00 & \text{ se } PC = \text{Baixo}\\
+  1,30 & \text{ se } PC = \text{Médio}\\
+  1,59 & \text{ se } PC = \text{Alto}
+  \end{cases}$
+
+:::
+::::
+
+# Paradoxo de Simpson
+
+## Paradoxo de Simpson
+
+- Como vimos no exemplo anterior:
+  - A relação entre PU e AP era uma relação fraca e positiva!
+  - Porém, com o ajuste da *RLM*, essa relação tornou-se negativa e relevante!
+  
+. . . 
+
+- Correlações Parciais:
+
+. . . 
+
+
+```{r}
+olsrr::ols_correlations(fitZilliLog) |>
+  kable(digits = 2, format.args = list(decimal.mark = ",", big.mark = "."))
+```
+
+-   Na tabela acima são vistas a correlação de ordem zero, a parcial e a semi-parcial (coluna *Part*).
+
+## Correlações Parciais
+
+:::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+olsrr::ols_correlations(fitZilliLog)
+```
+
+:::
+
+::: {.column width="50%"}
+
+
+
+:::
+::::
+
+-   O valor da correlação semi-parcial elevado ao quadrado é também conhecido como **coeficiente de determinação parcial**!
+  - Para a variável `AP`: $sr_{AP}^2 = (-0,171)^2 \approx 0,03$.
+  - Para a variável `DABM`: $sr_{DABM}^2 = (-0,234)^2 \approx 0,05$.
+  - Para a variável `NG`: $sr_{NG}^2 = (-0,325)^2 \approx 0,10$.
+
+-   O coeficiente de determinação parcial de uma variável representa o percentual de explicação que ela **adiciona** ao modelo!
+
+## Correlações Parciais
+
+:::: {.columns}
+::: {.column width="50%"}
+
+```{r}
+fit1 <- lm(log(PU) ~ PC + I(NG-1) + I(DABM-100), data = Zilli2020)
+S(fit1, brief = T)
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+fit2 <- lm(log(PU) ~ PC + I(NG-1) + I(DABM-100) + I(AP-100), data = Zilli2020)
+S(fit2, brief = T)
+```
+
+:::
+::::
+
+- Acréscimo de $R^2$ devido à inclusão de $AP = 0,7224 - 0,6934 \approx 0,03$
+
+## Por que muda a relação entre as variáveis?
+
+```{r}
+p1 <- 
+  ggplot(Zilli2020, aes(x = NG, y = log(PU))) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2")), col = "blue",
+               label.x = "right", label.y = "bottom")
+p2 <- 
+  ggplot(Zilli2020, aes(x = AP, y = log(PU))) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2")), col = "blue",
+               label.x = "right", label.y = "bottom")
+p1 + p2
+```
+
+
+
+## Por que muda a relação entre as variáveis?
+
+
+- Vejam a relação entre as variáveis explicativas $AP$ e $NG$:
+
+. . . 
+
+```{r}
+# plotdf(AP ~ NG, data = Zilli2020)
+ggplot(Zilli2020, aes(x = NG, y = AP)) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2")), col = "blue")
+```
+
+
+## Por que muda a relação entre as variáveis?
+
+- $\ln(PU) = \beta_{0NG} + \beta_{NG} \cdot \text{NG} + \varepsilon_{NG}$
+- $\ln(PU) = \beta_{0AP} + \beta_{AP} \cdot \text{AP} + \varepsilon_{AP}$
+- $\ln(PU) = \beta_{0C} + \beta_{1C} \cdot \text{NG} + \beta_{2C} \cdot \text{AP} + \varepsilon_{C}$
+
+
+- $NG = \beta_{0X} + \beta_{1X}\cdot \text{AP} + \varepsilon_X$
+
+- Então:
+  - $$\begin{aligned}
+  \ln(PU) &= \hat\beta_{0C} + \hat\beta_{1C}(\hat\beta_{0X} + \hat\beta_{1X}) \text{AP} + \hat\beta_{2C} \text{AP} \\
+  \ln(PU)  &= (\hat\beta_{0C} + \hat\beta_{1C}\hat\beta_{0X}) + (\hat\beta_{1C}\hat\beta_{1X} + \hat\beta_{2C}) \text{AP}
+  \end{aligned}$$
+  
+- $\hat\beta_{0AP} = \hat\beta_{0C} + \hat\beta_{1C}\hat\beta_{0X}$
+- $\hat\beta_{AP} = \hat\beta_{1C}\hat\beta_{1X} + \hat\beta_{2C}$
+
+## Por que muda a relação entre as variáveis?
+
+
+- $\ln(PU) = 8,6225 + 0,303 \cdot \text{NG} - 0,00108 \text{AP}$
+- $NG = 0,497 + 0,0094 \cdot \text{AP}$
+- $\beta_{0AP} = 8,6225 + 0,303\cdot 0,497 \approx 8,77$
+- $\beta_{AP} = 0,303\cdot0,0094 + (-0,00108) \approx + 0,00177$
+
+. . . 
+
+```{r}
+fitAP <- lm(log(PU) ~ AP, data = Zilli2020)
+S(fitAP)
+```
+
+## Por que muda a relação entre as variáveis?
+
+- $\ln(PU) = 8,6225 + 0,303 \cdot \text{NG} - 0,00108 \text{AP}$
+- $AP = 52,7 + 34,50 \cdot \text{NG}$
+- $\beta_{0NG} = 8,6225 -0,00108 \cdot 52,7 \approx 8,565$
+- $\beta_{NG} = -0,00108\cdot 34,50 + 0,303 \approx 0,266$
+
+. . . 
+
+```{r}
+fitNG <- lm(log(PU) ~ NG, data = Zilli2020)
+S(fitNG)
+```
+
+- Por isso a derivação de fatores através da regressão linear simples entre as
+variáveis explicativas e a variável independente não funciona!!!
+
+
+
+# Exemplo 3 {background-image="img/PPT_Chapter.png"}  
+
+## Dados
+
+- @wooldridge2019:
+
+. . . 
+
+```{r}
+library(wooldridge)
+data("hprice3")
+hprice3 <- within(hprice3, {
+  PU <- price/land
+#  nbh <- as.factor(nbh)
+})
+hprice3 <- hprice3[, c("PU", "price", "area", "land", "year", "y81", "age", 
+                       "nbh", "cbd", "inst", "rooms", "baths", "dist")]
+# library(writexl)
+# write_xlsx(hprice3, "./data/hprice3.xlsx")
+kable(head(hprice3, n = 10), 
+      digits = 2, 
+      format.args = list(decimal.mark = ",", big.mark = "."))
+```
+
+## Análise Exploratória
+
+```{r}
+plotdf(PU ~ land + area + cbd + y81 + age + nbh, data = hprice3)
+```
+
+## Análilse Exploratória
+
+- Importante: a transformação $\ln()$ aproxima os dados:
+
+. . . 
+
+
+```{r}
+p1 <- ggplot(hprice3, aes(x = land, y = PU)) +
+  geom_point()
+p2 <- ggplot(hprice3, aes(x = log(land), y = log(PU))) +
+  geom_point()
+p1 + p2
+```
+
+
+## Análise Exploratória
+
+```{r}
+plotdf(log(PU) ~ log(land) + area + cbd + y81 + age + nbh, data = hprice3)
+```
+
+
+## Ajuste de modelos
+
+```{r}
+fit <- lm(log(PU) ~ log(land) + area + cbd + y81 + age + nbh,
+          data = hprice3)
+S(fit)
+```
+
+## Diagnóstico do modelo
+
+- Para a estimação de fatores é importante atentar para o bom ajuste do modelo
+  - Com um modelo mal ajustado não será possível derivar fatores precisos
+  - Algumas ferramentas possibilitam a verificação da linearidade do modelo, 
+  por exemplo
+  
+## Diagnóstico do modelo
+
+```{r}
+crPlots(fit, layout = c(2, 3))
+```
+
+- A variável *Area* e a variável *Age* parecem pedir transformação!
+
+## Novo modelo
+
+```{r}
+fit <- lm(log(PU) ~ log(land) + log(area) + cbd + y81 + log1p(age) + nbh,
+          data = hprice3)
+S(fit)
+```
+
+- A variável *cbd* não se mostrou estatisticamente significante!
+
+## Diagnóstico do novo modelo
+
+```{r}
+crPlots(fit, layout = c(2, 3))
+```
+
+- As variáveis mais importantes são: *land*, *area*, *age* e *y81*
+  - *cbd* e *nbh* são duas variáveis pouco importantes!
+  
+## Modelo Final
+
+```{r}
+fit1 <- update(fit, .~. - cbd)
+S(fit1)
+```
+
+## Diagnóstico do Modelo Final
+
+```{r}
+crPlots(fit1, layout = c(2, 3))
+```
+
+## Diagnóstico do Modelo Final
+
+```{r}
+resid_panel(fit1, type = "standardized")
+```
+
+## Aparte: Resíduos *Jackknife*
+
+- Resíduos *jackknife* são resíduos padronizados que são computados ao realizar
+um processo de reamostragem conhecido como *jackknife*!
+
+- Grosso modo, o processo funciona da seguinte forma:
+  - Retira-se um dado da amostra
+  - Ajusta-se um modelo
+  - Computa-se o valor previsto com este modelo para o dado excluído da amostra
+  - Calcula-se o seu resíduo padronizado deste dado
+  - Prossegue-se retirando um dado de cada vez até que todos os dados tenham
+  seus resíduos calculados
+
+- Também são conhecidos como resíduos *studentizados* ($t_i$)
+- Um bom critério para detecção de *outliers*: $|t_i| > 3,0$
+
+## Diagnóstico do Modelo Final
+
+```{r}
+library(olsrr)
+ols_plot_resid_stud_fit(fit1, threshold = 3)
+```
+
+
+## Reajustamento do Modelo Final
+
+```{r}
+fit2 <- update(fit1, 
+               subset = -c(37, 46, 52, 67, 93, 157, 168, 
+                           229, 230, 259, 303, 315))
+ols_plot_resid_stud_fit(fit2, threshold = 3)
+```
+
+
+## Painel de Resíduos do Modelo Final
+
+```{r}
+resid_panel(fit2, type = "standardized")
+```
+
+## Estatísticas do Modelo Final
+
+```{r}
+S(fit2)
+```
+
+## Centralização do Modelo Final
+
+```{r}
+hist(hprice3$land[hprice3$land < 100000])
+```
+
+- Moda: `r brf(collapse::fmode(hprice3$land))` sqft $\approx 1 acre \approx 4046,85 m^2$
+
+## Centralização do Modelo Final
+
+```{r}
+hist(hprice3$area)
+```
+
+- Moda: `r brf(collapse::fmode(hprice3$area))` sqft $\approx 230 m^2$
+
+## Outras variáveis
+
+- y81: 0 (não)
+- age: 0 (novo)
+- nbh: 0
+
+
+## Modelo Centralizado
+
+```{r}
+fitCenter <- lm(log(PU) ~ log(land/43560) + log(area/2464) + y81 + log1p(age) + 
+    nbh, data = hprice3, subset = -c(37, 46, 52, 67, 93, 157, 
+    168, 229, 230, 259, 303, 315))
+S(fitCenter)
+```
+
+## Derivação de Fatores
+
+- $PU_{Hom} = \exp(\hat\beta_0^*) = \exp(0,90) \approx 2,46$
+
+- $F_S = \left ( \frac{43.560}{S_i}\right)^{0,93}$
+- $F_A = \left ( \frac{A_i}{2.464}\right)^{0,48}$
+- $F_Y = \begin{cases}
+  1 & \text{ se } y_{81i} = 0;\\
+  \exp(.35) = 1,425& \text{ se } y_{81i} = 1;
+  \end{cases}
+  $
+- $F_I = (1+Age_i)^{-0,105}$
+- $F_N = \exp(-0,02)^{nbh_i} = 0,98^{nbh}$
+
+## Aplicação
+
+- Avaliar por fatores:
+  - $S = 360m^2$; $A = 100 m^2$, $y_{81} = 1$, $age = 0$, $nbh = 6$
+  - Obs.:
+    $1m^2 = 10,764\, sqft$
+  
+- Solução pelo modelo:
+
+- $$\begin{aligned}
+\widehat{\ln(PU)} = 0,90 - 0,93 \ln(S/43.560) + 0,48\cdot\ln(A/2.464) + \\
+0,3545\cdot y_{81}-0,105 \ln(1+age) - 0,02\cdot nbh
+\end{aligned}$$
+
+- $$\begin{aligned}
+\widehat{\ln(PU)} = 0,90 - 0,93 \ln(3.875/43.560) + 0,48\cdot\ln(1.076,4/2.464) + \\
+0,3545\cdot 1,0 - 0,105 \ln(1+0) - 0,02\cdot 6
+\end{aligned}$$
+
+- $$\widehat{\ln(PU)} = 0,90 + 2,25 - 0,40 + 0,3545 - 0 - 0,12 = 2,9845$$
+
+```{r}
+#| eval: true
+# p <- predict(fitCenter, newdata = list(land = 3875, area = 1076.4, y81 = 1, age = 0, nbh = 6))
+p <- 2.9845
+# exp(p)
+```
+
+- $\widehat{PU} = \exp(2,9845) \approx$ `r brf(exp(p))` (US$/sqft)
+
+## Solução por fatores
+
+- $F_S = \left ( \frac{43.560}{S_i}\right)^{0,93} =  \left ( \frac{43.560}{3.875}\right)^{0,93} = 9,49$
+- $F_A = \left ( \frac{A_i}{2.464}\right)^{0,48} = \left ( \frac{1.076,4}{2.464}\right)^{0,48} = 0,67$
+- $F_Y = 1,425$
+- $F_I = (1+Age_i)^{-0,105} = (1+0)^{-0,105} = 1,0$
+- $F_N = 0,98^{nbh} = 0,98^6 = 0,886$
+
+- $\widehat{PU}_i = 2,46\cdot F_{Si}\cdot F_{Ai}\cdot F_{Y_i}\cdot F_{Ii}\cdot F_{Ni}$
+- $\widehat{PU}_i = 2,46\cdot 9,49 \cdot 0,67 \cdot 1,425 \cdot 1,0 \cdot 0,886$
+- $\widehat{PU}_i = 2,46 \cdot 8,03 \approx 19,75$ (US$/sqft)
+
+
+## Análise
+
+```{r}
+#| results: hide
+library(skimr)
+a <- skim(hprice3)
+b <- print(a, include_summary = FALSE)
+```
+
+```{r}
+kable(b[, -1], digits = 2,
+      format.args = list(big.mark = ".", decimal.mark = ","),
+      col.names = c("Var.", "n_missing", "%", "Mean", "SD", "P0", "P25", "P50", 
+                    "P75", "P100", "Hist.")
+      ) |>
+  kable_styling(font_size = 18)
+```
+
+- Range da Var. *land*: `r brf(range(hprice3$land), nsmall = 0)` sqft (159 a 50.585 $m^2$)
+- Range da Var. *area*: `r brf(range(hprice3$area))` sqft (68 a 477 $m^2$)
+- Range da Var. *age*:  `r brf(range(hprice3$age))` anos
+
+
+## Referências
+
+

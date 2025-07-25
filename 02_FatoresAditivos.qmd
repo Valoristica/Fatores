@@ -1,0 +1,414 @@
+---
+title: "Curso de Fatores"
+subtitle: "*Fatores Aditivos Fundamentados*"
+author: "Luiz Droubi"
+institute: Academia da Engenharia de Avaliações
+date: last-modified
+date-format: long
+title-slide-attributes:
+  data-background-image: img/PPT_abertura.png
+  #data-background-size: contain
+  #data-background-opacity: "0.5"
+  data-footer: "<a href='http://www.valoristica.com.br'>http://www.valoristica.com.br</a>"
+include-after-body: add-custom-footer.html
+lang: pt
+format:
+  revealjs:
+    theme: [default, style.scss]
+    logo: img/logo.png
+    # theme: beige
+    # smaller: true
+    scrollable: true
+    incremental: true
+    transition: slide
+    background-transition: fade
+fontsize: 1.8em
+bibliography: references.bib
+brand: true
+toc: true
+toc-depth: 1
+footer: "VALORÍSTICA"
+slide-number: true
+---
+
+```{r}
+#| include: false
+library(kableExtra)
+library(appraiseR)
+library(broom)
+```
+
+# Fatores Aditivos {background-image="img/PPT_Chapter.png"}  
+
+## Introdução
+
+- Os fatores multiplicativos derivam de um modelo multiplicativo
+  - $\widehat{PU} = \exp(\hat\beta_0).\exp(\hat\beta_1)^{X_1}\cdot\ldots\cdot\exp(\hat\beta_k)^{X_k}$
+
+- Da mesma maneira, os fatores aditivos, devem ser derivados de um modelo aditivo
+  - $\widehat{PU} = \hat\beta_0 + \hat\beta_1X_1 + \ldots + \hat\beta_kX_k$
+
+- Apesar dos erros no mercado imobiliário dificilmente aparecerem na forma 
+aditiva
+  - Não podemos sustentar que nenhum mercado imobiliário apresentam erros 
+  multiplicativos
+
+- Ainda, existem técnicas que permitem o ajustamento de modelos com erros 
+não-constantes
+  - Ressuscitando MQP: @ROMANO20171
+  - MQP na Engenharia de Avaliações: @wls2024
+  
+## Introdução
+
+- Trabalhar na escala original (PU) tem algumas vantagens
+  - Ausência de distorções devido às transformações
+  - Desnecessidade de retransformação da variável
+  - Facilidade de interpretação dos coeficientes
+
+## Derivação de Fatores Aditivos
+
+- Como bem observou @lima2006, se na avaliação por fatores aditivos, temos:
+  - $$\widehat{PU}_i = \overline{PU}_{hom}.[1 + (F_{1i}-1) + (F_{2i}-1) + \ldots + (F_{ki}-1)]$$
+
+- E na avaliação por regressão múltipla, temos:
+  - $$\widehat{PU}_i = \hat{\beta_0}.+ \hat{\beta_1}X_{1i} + \hat{\beta_2}X_{2i} + \ldots + \hat{\beta_k}X_{ki}$$
+
+- $$\therefore \left\{\begin{matrix}
+    \hat\beta_0 = \overline{PU}_{hom} \\
+    F_{1i}=\hat{\beta_1}/\hat{\beta_0}.X_{1i} \\
+    F_{2i}=\hat{\beta_2}/\hat{\beta_0}.X_{2i}  \\
+    \cdots \\
+    F_{ki}=\hat{\beta_k}/\hat{\beta_0}.X_{ki}
+    \end{matrix}\right.$$
+
+- Porém, quem disse que $\hat\beta_0 = \overline{PU}_{hom}$?
+
+## Derivação de Fatores Aditivos
+
+- $\hat\beta_0 = \overline{PU}_{hom}\Leftrightarrow$ as variáveis explicativas
+estiverem centralizadas!
+
+# Exemplo {background-image="img/PPT_Chapter.png"}  
+
+## Dados
+
+```{r}
+library(readxl)
+veyron <- read_excel("data/veyron.xlsx")
+veyron <- within(veyron, {
+  Ano <- factor(Ano)
+  PC <- factor(PC, levels = c("Baixo", "Medio", "Alto"))
+  Infra <- factor(Infra, ordered = T)
+  Studio <- factor(Studio)
+  RendaMedia <- RendaMedia/1212 # transforma renda média para s.m.
+})
+```
+
+```{r}
+kable(head(veyron[, c("PT", "PU", "AP", "PC", "Idade", "Ano", 
+                      "Vagas", "Suites", "DBM")],
+           n = 15),
+      digits = 2, format.args = list(decimal.mark = ",", big.mark = "."))
+```
+
+
+## Modelo Aditivo
+
+
+```{r}
+dados <- veyron[-c(6, 15, 67, 107), ]
+casos <- complete.cases(dados[, c("PU", "PC", "Ano", "Idade", "AP")])
+dados <- dados[casos, ]
+fit <- lm(PU ~ PC + Ano + log(Idade) + log(AP), 
+          data = dados)
+fit |>
+  tidy(exponentiate = F, conf.int = T, conf.level = .80) |>
+  kable(digits = 2, 
+        format.args = list(big.mark = ".", decimal.mark = ","),
+        format = "html", 
+        col.names = c("Termo", "Est.", "Erro", "Est. t", "p-valor",           
+                      "Inf.", "Sup.")) |>
+  footnote(alphabet = c(paste("Dados: ", nobs(fit)), 
+                        paste("R2: ", brf(R2(fit), digits = 2)),
+                        paste("R2aj: ", brf(adjR2(fit), digits = 2))
+                        ),
+           escape = F)  |>
+  add_header_above(c(" " = 5, "IC (80%)" = 2))
+```
+
+
+
+## Gráficos do Modelo
+
+```{r}
+plotModel(fit, residuals = T)
+```
+
+## Diagnóstico do Modelo
+
+```{r}
+# par(mfrow = c(2,2))
+# plot(fit)
+library(ggResidpanel)
+resid_panel(fit, type = "standardized")
+```
+
+## Modelo Aditivo Ponderado
+
+- Aplicando pesos para um melhor ajuste:
+
+. . . 
+
+```{r}
+Fitted <- fitted(fit)
+Res <- residuals(fit)
+auxFit <- lm(Fitted ~ abs(Res))
+w <- 1/fitted(auxFit)^2
+wfit <- lm(PU ~ PC + Ano + log(Idade) + log(AP), 
+           data = dados, weights = w)
+wfit |>
+  tidy(exponentiate = F, conf.int = T, conf.level = .80) |>
+  kable(digits = 2, 
+        format.args = list(big.mark = ".", decimal.mark = ","),
+        format = "html", 
+        col.names = c("Termo", "Est.", "Erro", "Est. t", "p-valor",           
+                      "Inf.", "Sup.")) |>
+  footnote(alphabet = c(paste("Dados: ", nobs(wfit)), 
+                        paste("R2: ", brf(R2(wfit), digits = 2)),
+                        paste("R2aj: ", brf(adjR2((wfit)), digits = 2))
+                        ),
+           escape = F)  |>
+  add_header_above(c(" " = 5, "IC (80%)" = 2))
+```
+
+- Observe-se a melhora no $R^2$!
+
+## Diagnóstico do Modelo Aditivo Ponderado
+
+```{r}
+# par(mfrow = c(2,2))
+# plot(wfit)
+resid_panel(wfit, type = "standardized")
+```
+
+- Melhor *pero no mucho*!
+  - Aceitável!
+
+## Modelo Aditivo Ponderado Centralizado
+
+
+```{r}
+fitCenter <- lm(PU ~ PC + Ano + log(Idade/10) + log(AP/100), data = dados,
+                weights = w)
+fitCenter |>
+  tidy(exponentiate = F, conf.int = T, conf.level = .80) |>
+  kable(digits = 2, 
+        format.args = list(big.mark = ".", decimal.mark = ","),
+        format = "html", 
+        col.names = c("Termo", "Est.", "Erro", "Est. t", "p-valor",           
+                      "Inf.", "Sup.")) |>
+  footnote(alphabet = c(paste("Dados: ", nobs(fitCenter)), 
+                        paste("R2: ", brf(R2(fitCenter), digits = 2)),
+                        paste("R2aj: ", brf(adjR2((fitCenter)), digits = 2))
+                        ),
+           escape = F)  |>
+  add_header_above(c(" " = 5, "IC (80%)" = 2))
+```
+
+## Interpretação das variáveis
+
+- Para uma derivação formal dos fatores, podem ser utilizadas as derivadas 
+parciais da equação de regressão em relação a cada termo.
+ - $$\begin{aligned}
+ PU = 4.833,8 + 2.0308,4\cdot PCMedio + 5.842,9\cdot PCAlto + \\
+ 3.487,0\cdot Ano2022 - 1.065,6\cdot\ln(Idade/10) - 1.329,5\cdot\ln(AP/100)
+ \end{aligned}$$
+    - $\overline{PU}_{Hom} = 4.833,80$
+
+- Para a variável `Ano`:
+  - $$\frac{\partial PU(PC, Ano, Idade, AP)}{\partial \text{Ano}} = \frac{\partial  3.487,0.\text{Ano}}{\partial \text{Ano}} = 3.487$$
+  - $\therefore \delta PU = 3.039.\delta Ano$
+    - Ou seja: se a var. $Ano$ passa de 2018 (nível de referência) para 2022,
+    então o PU aumenta em R$ 3.487,0$/m^2$.
+  
+## Interpretação das variáveis (2)
+
+- Para a variável `Idade`: $$\frac{\partial PU(PC, Ano, Idade, AP)}{\partial \text{Idade}} = \frac{\partial\,-1.065,6\cdot\ln(Idade/10)}{\partial \text{Idade}}= - \frac{1.065,6}{Idade}$$
+  - $\therefore \delta PU = -1.065,6.\delta Idade$
+  - Ou seja, se a Idade do avaliando varia 1 ano, para 11 anos 
+  ($\delta Idade = 1$), então $\delta{PU} \approx -\frac{-1.065,6}{10}\cdot 11 = + \text{ R\$ } -1.065,6/m^2$
+    - Deve-se reparar que a derivada muda em função da idade
+      - De 11 para 12 anos a variação será menor!
+    
+- Ou seja, o impacto da variável *Idade* é não-linear
+  - A únida maneira de se ajustar um fator é através da transformação $\ln$
+
+## Interpretação das variáveis (3)
+
+-   Para a variável `AP`:
+  - $$\frac{\partial PU(PC, Ano, Idade, AP)}{\partial AP} = \frac{\partial -1.329,50\cdot \ln(AP/100)}{\partial AP}$$
+  - $$\frac{\partial PU}{\partial AP} = -\frac{1.329,50}{(AP)}$$
+  - O aumento de 1% em `AP` corresponde:
+    - $\delta AP/AP = 1\% \rightarrow \delta PU = -1.329,50\cdot 1\% \approx \text {R\$ }-13,29/m^2$
+  - Cuidado: a interpretação acima vale para pequenos percentuais de variação!
+
+-   O fator área deve ser calculado: $F_{Area} = -1.329,5.\ln(AP/100)$
+ -  Por exemplo: para um imóvel com área igual a 150 $m^2$:
+ -  $F_{Area} = - 1.329,5.\ln(150/100) \approx -539,0 \text{ R\$}/m^2$
+ 
+## IMPORTANTE!
+
+- Não é possível utilizar fatores do tipo: $\left(\frac{X_{imóvel}}{X_{paradigma}}\right)^\alpha$ de forma aditiva!!!
+
+- Um fator do tipo $\left(\frac{X_{imóvel}}{X_{paradigma}}\right)^\alpha$
+somente pode advir de um modelo multiplicativo!
+
+- Por exemplo:
+  - Um Fator Testada do tipo:
+    - $$F_t = \left ( \frac{T_i}{T_{p}} \right)^{0,10}$$
+  - De onde viria?
+  
+## IMPORTANTE!
+
+- Só poderia advir de um modelo de regressão do tipo:
+    - $$\widehat{\ln(PU)} = \hat\beta_0 + \hat\beta_1\ln(T_i/12) + \ldots + \hat \beta_k (X_k/c_k)$$
+  - Então o Fator Testada seria:
+      - $$F_t = \left ( \frac{T_i}{12} \right)^{\hat\beta_1}$$
+      
+- Na forma aditiva as variáveis transformadas para o $\ln$ tem fator na forma:
+  - $$\frac{\hat\beta_k}{\hat\beta_0^*}\cdot \ln(X_k/c_k) + 1$$
+
+## Derivação de Fatores Aditivos
+
+### Com o método de @lima2006 ajustado
+
+- Fator Padrão Construtivo:
+  - $$F_{PC} =  \begin{cases}
+      4.833,8/4.833,8 = 1,00 & \text{ se } PC=Baixo \\
+      (4.833,8 + 2.308,4)/4.833,8 = 1,48 & \text{ se } PC=Medio \\
+      (4.833,8 + 5.842,9)/4.833,8 = 2,21 & \text{ se } PC=Alto 
+      \end{cases}
+      $$
+
+- Fator Ano:
+  - $$F_{Ano} =  \begin{cases}
+      4.833,8/4.833,8 = 1,00 & \text{ se } Ano = 2018\\
+      (4.833,8 + 3.487,0)/4.833,8 = 1,72 & \text{ se } Ano = 2022
+      \end{cases}$$
+
+## Derivação de Fatores Aditivos
+
+### Com o método de @lima2006 ajustado
+
+:::: {.columns}
+::: {.column width="50%"}
+
+- Fator AP:
+- $F_{AP} = \frac{\beta_{AP}}{\beta_0}.\ln(AP_{i}/AP_{p}) + 1$
+- $F_{AP} = \frac{-1.329,5}{4.833,8}.\ln(AP_{i}/100) + 1$
+- $F_{AP} = -0,275.\ln(AP_{i}/100) + 1$
+
+
+:::
+
+::: {.column width="50%"}
+
+
+- Fator Idade:
+- $F_{\text{Idade}} =  \frac{\beta_{Idade}}{\beta_0}.\ln(\text{Idade}_{i}/\text{Idade}_{p}) + 1$
+- $F_{\text{Idade}} = \frac{-1.165,6}{4.833,8}.\ln(\text{Idade}_{i}/10) + 1$
+- $F_{\text{Idade}} = -0,24.\ln(\text{Idade}_{i}/10) + 1$
+
+:::
+::::
+
+
+## Aplicação de Fatores Aditivos
+
+- Se o imóvel paradigma (100m2, ano 2018, 10 anos de idade, PC Baixo)
+tem valor unitário de mercado igual a R\$ 4.833,80/m2
+
+- Quanto vale um apartamento de 200m2, 5 anos de idade, PC Médio, no ano de 2022?
+ - $\widehat{PU}_i = 4.833,8[1+[(F_{AP}-1) + (F_{Idade}-1)+(F_{Ano}-1)+(F_{PC}-1)]$
+ - $F_{AP} = -0,275\ln(200/100) + 1 \approx 0,81$
+ - $F_{Idade} = -0,24\ln(5/10) \approx 1,17$
+ - $F_{Ano} = 1,72\;(\text{2022})$
+ - $F_{PC} = 1,48\;(\text{Médio})$
+ - $\widehat{PU}_i = 4.833,8[1+[(0,81 - 1) + (1,17 - 1) + (1,72 - 1) + (1,48 - 1)]$
+ - $\widehat{PU}_i = 4.833,8[1 - 0,19 + 0,17 + 0,72 + 0,48]$
+ - $\widehat{PU}_i = 4.833,8 \cdot 2,18 = 10.537,68$
+
+## Comparação com previsões do modelo
+
+```{r}
+#| echo: true
+predict(fitCenter, newdata = list(PC = "Medio", Ano = "_2022", Idade = 5, AP = 200))
+```
+
+- Arredondamentos à parte, o método de @lima2006 funciona!
+  - Porém, deve-se perceber: só funcionou porque o modelo de regressão foi 
+  ajustado de forma centralizada no imóvel paradigma.
+  - Assim, o valor de $\hat\beta_0$ igualou-se ao valor do imóvel paradigma e 
+  permitiu a estimação consistente dos fatores de homogeneização!
+
+# Conclusão {background-image="img/PPT_Chapter.png"}  
+
+```{r, eval = FALSE}
+library(readxl)
+
+df <- read_excel("data/dados.xlsx")
+
+colnames(df) <- c("Id", "Endereço", "Complemento", "Area", "PercentualTerreno",
+                  "Distancia", "Garagem", "Idade", "PU")
+
+
+df <- within(df, {
+  Garagem <- ifelse(Garagem == 1, " Sim", " Não")
+  # Idade <- ifelse(Idade == 1, " <= 10 anos", " > 10 anos")
+  Idade <- factor(Idade, levels = c(0, 1), labels = c(" > 10 anos", " <= 10 anos"))
+  ATerreo <- Area*PercentualTerreno/100
+  ASuperiores <- Area*(1-PercentualTerreno/100)
+  Relacao <- ASuperiores/ATerreo
+})
+
+# write.table(df, file = "EC/dados.tsv", row.names=FALSE, sep="\t")
+
+
+fit <- lm(log(PU) ~ log(Area/1500) + log(PercentualTerreno/25) +
+            log(Distancia/100) + Garagem + Idade, data = df)
+summary(fit)
+```
+
+## Conclusão
+
+- Este é um modelo ruim, além de mal comunicado:
+  - $VU = -566,45-3,0555.10^{-9}.A^3 +548,17.\text{SetorUrbano}^{0,5}+143,27.\ln(Frente(\text{qualitativa}))$
+- Este é um bom modelo, porém ainda mal comunicado:
+  - $\hat{\ln(PU)} = 4,768-0,2703.\ln(A) + 0,2339.\ln(\%T)-0,0983.\ln(D)+0,3735.G+0,5186.I + \varepsilon$
+- Este é um bom modelo, porém melhor comunicado:
+  - $\hat{PU} = 117,68.A^{-0,270}.(\%T)^{0,234}.D^{-0,098}.1,45^{G}.1,68^I$
+- A centralização dos dados melhora a comunicação:
+  - $\hat{PU} = 3,10.(A/1500)^{-0,270}.(\%T/25\%)^{0,234}.(D-100)^{-0,098}.1,45^{G}.1,68^I$
+- Argumento que o modelo poderia ser assim exposto, para o melhor entendimento 
+do cliente (leigo):
+  - $\hat{PU} = 3,10.F_{Area}.F_{\%Terreo}.F_{Distância}.F_{Garagem}.F_{Idade}$
+
+## Conclusão
+
+- Os fatores de homogeneização continuam úteis!
+
+- Com os novos estudos, agora estão se tornando também consistentes!
+
+- A centralização de variáveis é importante para garantir uma estimação 
+consistente dos fatores de homogeneização
+
+- A independência ou correlação entre os regressores é importante para fins de 
+definir se um fator pode ser ajustado através de uma regressão simples
+
+- A clareza do Tratamento por Fatores deve ser trazida para o Tratamento 
+Científico
+
+- E a consistência do Tratamento Científico deve ser levada para o Tratamento 
+por Fatores!
+
+## Referências

@@ -1,0 +1,501 @@
+---
+title: "Utilização de Fatores"
+subtitle: "*Outliers*"
+author: "Luiz Droubi"
+institute: Academia da Engenharia de Avaliações
+date: last-modified
+date-format: long
+title-slide-attributes:
+  data-background-image: img/PPT_abertura.png
+  #data-background-size: contain
+  #data-background-opacity: "0.5"
+  data-footer: "<a href='http://www.valoristica.com.br'>http://www.valoristica.com.br</a>"
+include-after-body: add-custom-footer.html
+lang: pt
+format:
+  revealjs:
+    theme: [default, style.scss]
+    logo: img/logo.png
+    # theme: beige
+    # smaller: true
+    scrollable: true
+    incremental: true
+    transition: slide
+    background-transition: fade
+fontsize: 2em
+bibliography: references.bib
+brand: true
+toc: true
+toc-depth: 1
+footer: "VALORÍSTICA"
+slide-number: true
+---
+
+```{r}
+#| include: false
+library(kableExtra)
+library(appraiseR)
+```
+
+# Introdução {background-image="img/PPT_Chapter.png"}
+
+## Introdução {.smaller}
+
+- Antes da análise de fatores são pesquisados *outliers* nas variáveis
+independentes.
+  - > B.2.2 Para a utilização deste tratamento, considera-se como dado de mercado 
+  com atributos semelhantes aqueles em que cada um dos fatores de homogeneização, 
+  calculados em relação ao avaliando ou ao paradigma, estejam contidos entre 
+  0,50 e 2,00.
+
+- Após a homogeneização, é usual que façamos uma análise dos dados 
+homogeneizados (variável dependente) quanto à eventual presença de *outliers*
+
+- O critério para remover *outliers* varia, sendo comum a utilização do critério
+de Chauvenet e/ou a dos dois desvios-padrões
+  - > Após a homogeneização, devem ser utilizados critérios estatísticos 
+  consagrados de eliminação de dados discrepantes, para o saneamento da amostra.
+  Os dados discrepantes devem ser retirados um a um, com início pelo que esteja
+  mais distante da média. Admite-se a reintrodução de dados anteriormente 
+  retirados no processo.
+
+- Após a retirada de todos os *outliers*, a média dos dados remanescentes é
+calculada e também o desvio-padrão amostral.
+
+- É possível estabelecer um intervalo de confiança para a média, mas isto nem
+sempre é feito.
+
+## Problemas
+
+- Segundo @wilcox2003, quando dados na variável dependente são removidos, os
+dados remanescentes não são mais independentes e o erro-padrão fica comprometido
+
+- Procedimentos da *estatística robusta* devem ser utilizados, em lugar dos
+procedimentos clássicos, para evitar esse problema
+
+# Revisão de Estatistica Descritiva {background-image="img/PPT_Chapter.png"}
+
+## Nivelamento
+
+- A média aritmética é um estimador **clássico** de posição:
+  - $$\hat \mu = \overline X = \frac{1}{n}\sum_{i=1}^n x_i$$
+- A mediana é um estimador **robusto** de posição:
+  - $$\hat \mu = \widetilde{X} =\begin{cases}
+x_{(\frac{n+1}{2})}& \text{se}\;n\;\text{é ímpar} \\
+\frac{1}{2}\left (x_{(\frac{n}{2})} + x_{(\frac{n}{2}+1}) \right )& \text{se}\;n\;\text{é par} 
+\end{cases}
+  $$
+  
+- > In terms of power, the mean is preferable to the median or 20% trimmed mean 
+when dealing with symmetric distributions for which outliers are rare
+[@wilcox2023, p. 13].
+
+  
+## Nivelamento
+
+- Da mesma maneira, o desvio-padrão amostral é um estimador **clássico** de
+dispersão:
+  - $$\hat \sigma = s = \sqrt{\frac{1}{n-1}\sum_{i=1}^n(x_i - \overline x)^2}$$
+  
+- E o $\mathrm{IQR}_n$ é um estimador **robusto** da dispersão:
+  - $$
+  \begin{aligned}
+  \hat \sigma = \mathrm{IQR}_n &= \frac{1}{2\phi^{-1}(0,75)}(x_{(n - [n/4]+1)} - x_{([n/4])}) \\
+  \mathrm{IQR}_n &\approx 0,7413\cdot(Q_3 - Q_1)
+  \end{aligned}
+  $$
+  
+## Nivelamento {.smaller}
+
+- Um bom parâmetro para medir o quanto uma amostra é dispersa é o Coeficiente de
+Variação (CV):
+  - A análise do parâmetro de dispersão $s$, por si só, não diz muito, a menos 
+  que o comparemos com o parâmetro de posição $\overline X$.
+  - O coeficiente de variação faz essa comparação:
+    - Para a população:
+    $$\mathrm{CV} = \frac{\sigma}{\mu}$$
+    - Para a amostra: 
+    $$\mathrm{CV} = \frac{s}{\overline X}$$
+- Podemos também calcular um coeficiente de variação robusto $\mathrm{RCV}$:
+  - $$\mathrm{RCV} = \frac{\mathrm{IQR}_n}{ \widetilde{X}}$$
+
+# Exemplo 1 {background-image="img/PPT_Chapter.png"}
+
+## Exemplo 1 {.smaller}
+
+- Sejam os dados da @tbl-PU1:
+
+. . . 
+
+```{r}
+#| label: tbl-PU1
+#| tbl-cap: "Preços Unitários - Amostra Homogênea."
+set.seed(3)
+PU1 <- rlnorm(n = 10, meanlog = log(5000), sdlog = .75)
+kable(t(PU1), digits = 1,
+      format.args = list(big.mark = "", decimal.mark = ","))
+```
+
+. . . 
+
+### Descrição da amostra
+
+```{r}
+# kable(t(mosaic::fivenum(PU2)),  digits = 1,
+#       format.args = list(big.mark = ".", decimal.mark = ","),
+#       col.names = c("Mín.", "Q1", "M", "Q3", "Máx."))
+library(vtable)
+kable(st(data.frame(PU = PU1), add.median = T,
+         numformat = formatfunc(digits = 2, big.mark = ".", decimal.mark = ","),
+   out = 'return', simple.kable = T),
+   booktabs = TRUE,
+   #format = ifelse(type == "html", "markdown", "latex"),
+   col.names = c("Var.", "N", "Média", "Desvio Padrão", 
+                  "Min.", "Q1", "Mediana", "Q3", "Max."),
+   escape = F) |>
+  kable_styling(latex_options = c("HOLD_position", "striped"))
+```
+
+- Comparar a média com a mediana!
+- Perceber que a distância entre 
+  - o valor mínimo (2.004) e o primeiro quartil (2.826)
+  - é muito menor que a distância entre o terceiro quartil (6.001) e o valor máximo (12.935)
+- Computar grosseiramente o $\mathrm{IQR}_n \approx 0,75(6001-2826) = 2.381,25$ 
+- Comparar este último com o desvio-padrão ($\approx 35\%$ menor)!
+- Calcular o $\mathrm{CV} = 3.761/5.735 \approx 66\%$
+- Calcular o $\mathrm{RCV} = 2.381,25/5.223 \approx 46\%$
+
+## Gráficos {.smaller}
+
+```{r}
+Hist(PU1)
+```
+
+
+```{r}
+boxplot(PU1, horizontal = T)
+# MBoxplot(PU1, fences = "Carling")
+```
+
+## Análise de *outliers*
+
+- É usual que detectemos *outliers* baseado em um critério.
+  - Por exemplo, o critério dos dois desvios-padrões
+    - $$r_i = \frac{X_i - \overline X}{s}; \; |r_i| > 2,0$$
+  - Ou o critério de *Chauvenet*:
+    - $$r_i = \frac{X_i - \overline X}{s}; \; |r_i| > d/s_{crit}$$
+    - $$d/s_{crit} = |\phi^{-1}(1/4n)|$$
+
+## Análise de *outliers* {.smaller}
+
+```{r}
+kable(aug(PU1, rob = FALSE, format = FALSE), digits = 2,
+      format.args = list(big.mark = ".", decimal.mark = ",")) |>
+  kable_styling(font_size = 20,bootstrap_options = c("striped"))
+```
+
+# Mascaramento {background-image="img/PPT_Chapter.png"}
+
+## Mascaramento {.smaller}
+
+- *Mascaramento* ocorre quando *outliers* verdadeiros não são detectados
+- *Empoçamento* ocorre quando observações regulares são classificadas como
+*outliers*
+- Estes fenômenos usualmente ocorrem porque trabalhamos com estatísticas
+*não-robustas*, *i.e.* sensíveis à *outliers*
+- Mesmo critérios como o critério do *boxplot* de Tukey, que classifica como
+possíveis *outliers* os pontos além de $1,5\cdot \mathrm{IQR}$ dos quartis 
+inferior e superior, estão sujeitos ao mascaramento [ver @wilcox2023, p. 12].
+- A solução é trabalhar com estimadores robustos:
+  - Por exemplo, a mediana ($\widetilde{X}$) e o desvio mediano absoluto ($\mathrm{MAD}_n$)
+    - $$r_i = \frac{X_i -  \widetilde{X}}{\mathrm{MAD}_n}; \; |r_i| > 2,24$$
+    - $$\mathrm{MAD}_n = 1,4826\cdot \mathrm{Med}|X_i -  \widetilde{X}|$$
+    
+- > There are two common mistakes regarding how to deal with outliers. The first 
+is to search for outliers using the mean and standard deviation [@wilcox2023,
+p. 11]. 
+    
+## Análise robusta de *outliers* {.smaller}
+
+```{r}
+kable(aug(PU1, criterion = "2.24DP", format = FALSE), digits = 2,
+      format.args = list(big.mark = ".", decimal.mark = ",")) |>
+  kable_styling(font_size = 20,bootstrap_options = c("striped"))
+```
+
+
+## Análise robusta de *outliers* {.smaller}
+
+```{r}
+kable(aug(PU1[-c(10)], criterion = "2.24DP", format = FALSE), digits = 2,
+      format.args = list(big.mark = ".", decimal.mark = ",")) |>
+  kable_styling(font_size = 20,bootstrap_options = c("striped"))
+```
+
+
+
+## Análise robusta de *outliers* {.smaller}
+
+```{r}
+kable(aug(PU1[-c(8, 10)], criterion = "2.24DP", format = FALSE), digits = 2,
+      format.args = list(big.mark = ".", decimal.mark = ",")) |>
+  kable_styling(font_size = 20,bootstrap_options = c("striped"))
+```
+
+- A média, que antes estava inflada, agora é menor do que a mediana
+- A nova mediana não é mais a mediana "real" da amostra.
+
+# Estatística Robusta {background-image="img/PPT_Chapter.png"}
+
+## Estatísticas Robustas {.smaller}
+
+- Existem diversas estatísticas robustas, tanto para a medida de posição, como a
+mediana, como para a medida de dispersão, como o $\mathrm{MAD}_n$.
+
+- Dentre as estatísticas robustas, destacamos a **média aparada**, que é uma
+espécie de compromisso entre a média e a mediana
+  - Todas as observações são utilizadas para o cômputo da média, nenhuma é 
+  descartada
+  - Apenas uma (ou duas, no caso de amostras de tamnho par) observação é 
+  utilizada no cômputo da mediana, as outas são descartadas
+  - Na **média aparada**, descartamos uma fração menor de dados do que no
+  cômputo da mediana. 
+    - Por exemplo, na média aparada de 20%, $\overline X_{20}$, descartamos
+    20% dos dados em cada extremo da amostra
+    - Na média aparada de 25%, $\overline X_{25}$, descartamos
+    25% dos dados em cada extremo da amostra
+- Segundo @wilcox2023, é conveniente utilizar a média aparada, pois o 
+erro-padrão e os testes de hipóteses calculados após o descarte de *outliers*
+podem estar subestimados.
+
+- > The second mistake is discarding outliers and applying some standard method 
+for comparing means using the remaining data. This results in an incorrect 
+estimate of the standard error, regardless of how large the sample size
+might be [@wilcox2023, 12].
+
+## Média Aparada {.smaller}
+
+
+- A média de uma amostra $X = \{2, 4, 6, 8, 10, 20\}$ é:
+  - $\overline X = (2+4+6+8+10+20)/6 = 8,33$
+    - Todos os pontos são utilizados no cálculo da média, nenhum é descartado.
+- A mediana dessa mesma amostra é:
+  - $\widetilde{X} = (6+8)/2 = 7$
+    - Ou seja, 4 dados são descartados, 2 em cada extremo da amostra, e 2 dados
+    centrais são utilizados para o cômputo da mediana
+- A média aparada de 20% descarta 1 dado em cada extremo da amostra (não é
+possível descartar 1,2 dados):
+  - $\overline X_{20} = (4+6+8+10)/4 = 7$
+- Perceber que se  $X = \{-10, 4, 6, 8, 10, 20\}$, tanto $\widetilde{X}$ quanto 
+$\overline X_{20}$ se manteriam as mesmas.
+  - Ambas as medidas são robustas
+    - $\widetilde{X}$ é mais robusta, pois 2 dados em cada extremo podem
+    estar contaminados, e ela ainda assim não se altera
+    - $\overline X_{20}$, neste caso, só é robusta à contaminação de 1 dado em 
+    cada extremo da amostra.
+    - $\overline X$ é sensível a qualquer ponto de contaminação!
+    
+
+## Análise robusta de *outliers* {.smaller}
+
+```{r}
+#| label: tbl-TrimmedMean
+#| tbl-cap: "Análise dos dados com média aparada (30%)"
+kable(aug(PU1, tr = .30, criterion = "2.24DP", format = FALSE), 
+      digits = 2,
+      format.args = list(big.mark = ".", decimal.mark = ",")) |>
+  kable_styling(font_size = 20, bootstrap_options = c("striped"))
+```
+
+## O que é estimado com a média aparada?
+
+- Segundo @wilcox2003, se a distribuição dos dados é normal, então a média
+aparada estima o parâmetro de posição da distribuição normal. Para toda 
+distribuição simétrica dos dados, ocorre o mesmo.
+
+- No entanto, se os dados são assimétricos, a média aparada é uma medida que
+vai estar localizada mais próxima da massa central dos dados, entre a mediana e 
+a média.
+
+- > If the distributions are skewed, the median and 20% trimmed mean can better 
+reflect what is typical, and improved control over the Type I error probability
+can be achieved. When outliers occur, there is the possibility that the mean 
+will have a much larger standard error than the median or 20% trimmed mean
+[@wilcox2023, p. 13].
+
+## O que é estimado com a média aparada?
+
+
+![](img/TrimmedMean_Normal.png)
+
+## O que é estimado com a média aparada?
+
+![](img/TrimmedMean_Lognormal.png)
+
+# Exemplo 2 {background-image="img/PPT_Chapter.png"}
+
+## Exemplo 2{.smaller}
+
+- Sejam os dados da @tbl-PU2
+
+. . . 
+
+```{r}
+#| label: tbl-PU2
+#| tbl-cap: "Preços Unitários - Amostra Homogênea."
+library(EnvStats)
+set.seed(2)
+PU2 <- rlnormAlt(n = 12, mean = 5000, cv = .5)
+kable(t(PU2), digits = 1,
+      format.args = list(big.mark = "", decimal.mark = ","))
+```
+
+. . . 
+
+### Descrição da amostra
+
+```{r}
+# kable(t(mosaic::fivenum(PU2)),  digits = 1,
+#       format.args = list(big.mark = ".", decimal.mark = ","),
+#       col.names = c("Mín.", "Q1", "M", "Q3", "Máx."))
+library(vtable)
+kable(st(data.frame(PU = PU2), add.median = T,
+         numformat = formatfunc(digits = 2, big.mark = ".", decimal.mark = ","),
+   out = 'return', simple.kable = T),
+   booktabs = TRUE,
+   #format = ifelse(type == "html", "markdown", "latex"),
+   col.names = c("Var.", "N", "Média", "Desvio Padrão", 
+                  "Min.", "Q1", "Mediana", "Q3", "Max."),
+   escape = F) |>
+  kable_styling(latex_options = c("HOLD_position", "striped"))
+```
+
+## Gráficos
+
+```{r}
+Hist(PU2)
+```
+
+
+```{r}
+boxplot(PU2, horizontal = T)
+# MBoxplot(PU2)
+```
+
+
+## Análise de *outliers* {.smaller}
+
+```{r}
+kable(aug(PU2, rob = FALSE, format = FALSE), digits = 2,
+      format.args = list(big.mark = ".", decimal.mark = ",")) |>
+  kable_styling(font_size = 20, bootstrap_options = c("striped"))
+```
+
+## 2º Passo {.smaller}
+
+```{r}
+kable(aug(PU2[-9], rob = FALSE, format = FALSE), digits = 2,
+      format.args = list(big.mark = ".", decimal.mark = ",")) |>
+  kable_styling(font_size = 20, bootstrap_options = c("striped"))
+```
+
+## 3º Passo {.smaller}
+
+```{r}
+kable(aug(PU2[-c(3, 9)], rob = FALSE, format = FALSE), digits = 2,
+      format.args = list(big.mark = ".", decimal.mark = ",")) |>
+  kable_styling(font_size = 20, bootstrap_options = c("striped"))
+```
+
+## Alternativa Robusta {.smaller}
+
+```{r}
+#| label: tbl-Exemplo2
+#| tbl-cap: "Cálculo com média aparada a 25%."
+kable(aug(PU2, rob = TRUE, criterion = "2.24DP", tr = .25, format = FALSE), 
+      digits = 2,
+      format.args = list(big.mark = ".", decimal.mark = ",")) |>
+  kable_styling(font_size = 18, bootstrap_options = c("striped"))
+```
+
+# O critério de Chauvenet modificado {background-image="img/PPT_Chapter.png"}
+
+## O Diagrama de Caixa de Chauvenet
+
+- O diagrama de caixa de Chauvenet de @lin2025:
+
+. . . 
+
+```{r}
+library(ChauBoxplot)
+chau_boxplot(PU2, horizontal = T)
+```
+
+## O Diagrama de Caixa de Tukey
+
+- @lin2025 modificaram o critério de Chauvenet com a finalidade de modificar o
+critério das cercas do diagrama de caixa de Tukey
+  - No diagrama de caixa de Tukey, os bigodes se extendem até LF e UF:
+    - $\mathrm{LF} = Q_1 - k\cdot\mathrm{IQR}$
+    - $\mathrm{UF} = Q_3 + k\cdot\mathrm{IQR}$
+    - É usual que se utilize $k = 1,5$
+    - Além de LF e UF os pontos são considerados prováveis *outliers* e plotados
+    individualmente
+    - Com $k = 3$ tem-se os limites LF e UF além dos quais estão os *outliers*
+    extremos.
+  - Um problema com o diagrama de caixa de Tukey é que o critério apresentado 
+  não leva em conta o tamanho da amostra
+  
+## O Diagrama de Caixa de Chauvenet {.smaller}
+
+- Com o diagrama de Caixa de Chauvenet é possível levar em conta o tamanho da
+amostra na identificação dos *outliers*
+  - No diagrama de caixa de Chauvenet, os bigodes se extendem até LF e UF:
+    - $\mathrm{LF} = Q_1 - k_n^{Chau}\cdot\mathrm{IQR}$
+    - $\mathrm{UF} = Q_3 + k_n^{Chau}\cdot\mathrm{IQR}$
+    - $k_n^{Chau} = \frac{\phi^{-1}(1-0,25/n)}{1,35}-0,5$
+  - Exemplo:
+    - $\overline X = 5.000, Q_1 = 4.000; \; Q_3 = 6.500; n=12$
+    - $k_n^{Chau} = \frac{\phi^{-1}(1-0,25/12)}{1,35}-0,5 =1,00$
+    - $\mathrm{LF} = 4.000 - 1,00(6.500-4.000) = 1.500$
+    - $\mathrm{UF} = 6.500 + 1,00(6.500-4.000) = 9.000$
+    
+## O Diagrama de Caixa de Chauvenet {.smaller}
+
+```{r}
+chau_boxplot(PU2, horizontal = T, ylim = c(1500, 12500))
+stripchart(PU2, add = T, col = "firebrick", pch = 21, bg = "red")
+```
+
+
+# Considerações Finais {background-image="img/PPT_Chapter.png"}    
+    
+## Considerações Finais {.smaller}
+
+- Cuidado com o procedimento padrão de remoção de *outliers*, seja com qual
+critério for. Apesar de válido, este procedimento gera erros-padrões usualmente
+subestimados, que irão levar à intervalos de confiança e testes de hipóteses
+inválidos!
+
+- > Rather than use means, trimmed means, or the median, another approach is to 
+use an estimator that down-weights or eliminates outliers. For example, use the
+MAD-median to search for outliers, remove any that are found, and average the 
+remaining values. This is generally known as a modified one-step Mestimator 
+(MOM). **There is a method for estimating the standard error, but currently a
+percentile bootstrap method seems preferable when testing hypotheses**. This 
+approach might seem preferable to using a trimmed mean or median because 
+trimming can eliminate points that are not outliers. But this issue is far from
+simple. Indeed, there are indications that when testing hypotheses, the 
+expectation is that a trimmed mean or median will perform better in terms of 
+Type I errors and power (Wilcox, 2022a). However, there are exceptions: no 
+single estimator dominates. As previously noted, **an invalid strategy is to 
+eliminate extreme values and apply conventional methods for means based on the 
+remaining data because the wrong standard error is used**. Switching to a
+percentile bootstrap deals with this issue when using MOM as well as related 
+estimators [@wilcox2023, p. 16]. 
+    
+# Obrigado!  {background-image="img/PPT_Chapter.png"}
+
+<lfpdroubi@gmail.com>
+
+## Referências

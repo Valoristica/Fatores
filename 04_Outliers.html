@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+<html lang="pt"><head>
+<script src="04_Outliers_files/libs/clipboard/clipboard.min.js"></script>
+<script src="04_Outliers_files/libs/quarto-html/tabby.min.js"></script>
+<script src="04_Outliers_files/libs/quarto-html/popper.min.js"></script>
+<script src="04_Outliers_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="04_Outliers_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="04_Outliers_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="04_Outliers_files/libs/quarto-html/quarto-syntax-highlighting-985aa47af68dae11cd4d235c71fb941e.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.27">
+
+  <meta name="author" content="Luiz Droubi">
+  <title>Utilização de Fatores</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="04_Outliers_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="04_Outliers_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+      margin-bottom: 0em;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
+  <link rel="stylesheet" href="04_Outliers_files/libs/revealjs/dist/theme/quarto-8c5d33aee31bbb7b74a20154352ea936.css">
+  <link href="04_Outliers_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="04_Outliers_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="04_Outliers_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="04_Outliers_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <script src="04_Outliers_files/libs/kePrint-0.0.1/kePrint.js"></script>
+
+  <link href="04_Outliers_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-image="img/PPT_abertura.png" data-footer="<a href='http://www.valoristica.com.br'>http://www.valoristica.com.br</a>" class="quarto-title-block center">
+  <h1 class="title">Utilização de Fatores</h1>
+  <p class="subtitle"><em>Outliers</em></p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Luiz Droubi 
+</div>
+        <p class="quarto-title-affiliation">
+            Academia da Engenharia de Avaliações
+          </p>
+    </div>
+</div>
+
+  <p class="date">23 de julho de 2025</p>
+</section><section id="TOC">
+<nav role="doc-toc"> 
+<h2 id="toc-title">Índice</h2>
+<ul>
+<li class="fragment"><a href="#/introdução" id="/toc-introdução">Introdução</a></li>
+<li class="fragment"><a href="#/revisão-de-estatistica-descritiva" id="/toc-revisão-de-estatistica-descritiva">Revisão de Estatistica Descritiva</a></li>
+<li class="fragment"><a href="#/exemplo-1" id="/toc-exemplo-1">Exemplo 1</a></li>
+<li class="fragment"><a href="#/mascaramento" id="/toc-mascaramento">Mascaramento</a></li>
+<li class="fragment"><a href="#/estatística-robusta" id="/toc-estatística-robusta">Estatística Robusta</a></li>
+<li class="fragment"><a href="#/exemplo-2" id="/toc-exemplo-2">Exemplo 2</a></li>
+<li class="fragment"><a href="#/o-critério-de-chauvenet-modificado" id="/toc-o-critério-de-chauvenet-modificado">O critério de Chauvenet modificado</a></li>
+<li class="fragment"><a href="#/considerações-finais" id="/toc-considerações-finais">Considerações Finais</a></li>
+<li class="fragment"><a href="#/obrigado" id="/toc-obrigado">Obrigado!</a></li>
+</ul>
+</nav>
+</section>
+<section>
+<section id="introdução" class="title-slide slide level1 center" data-background-image="img/PPT_Chapter.png">
+<h1>Introdução</h1>
+
+</section>
+<section id="introdução-1" class="slide level2 smaller">
+<h2>Introdução</h2>
+<ul>
+<li class="fragment"><p>Antes da análise de fatores são pesquisados <em>outliers</em> nas variáveis independentes.</p>
+<ul>
+<li class="fragment"><blockquote>
+<p>B.2.2 Para a utilização deste tratamento, considera-se como dado de mercado com atributos semelhantes aqueles em que cada um dos fatores de homogeneização, calculados em relação ao avaliando ou ao paradigma, estejam contidos entre 0,50 e 2,00.</p>
+</blockquote></li>
+</ul></li>
+<li class="fragment"><p>Após a homogeneização, é usual que façamos uma análise dos dados homogeneizados (variável dependente) quanto à eventual presença de <em>outliers</em></p></li>
+<li class="fragment"><p>O critério para remover <em>outliers</em> varia, sendo comum a utilização do critério de Chauvenet e/ou a dos dois desvios-padrões</p>
+<ul>
+<li class="fragment"><blockquote>
+<p>Após a homogeneização, devem ser utilizados critérios estatísticos consagrados de eliminação de dados discrepantes, para o saneamento da amostra. Os dados discrepantes devem ser retirados um a um, com início pelo que esteja mais distante da média. Admite-se a reintrodução de dados anteriormente retirados no processo.</p>
+</blockquote></li>
+</ul></li>
+<li class="fragment"><p>Após a retirada de todos os <em>outliers</em>, a média dos dados remanescentes é calculada e também o desvio-padrão amostral.</p></li>
+<li class="fragment"><p>É possível estabelecer um intervalo de confiança para a média, mas isto nem sempre é feito.</p></li>
+</ul>
+</section>
+<section id="problemas" class="slide level2">
+<h2>Problemas</h2>
+<ul>
+<li class="fragment"><p>Segundo <span class="citation" data-cites="wilcox2003">R. Wilcox e Keselman (<a href="#/referências" role="doc-biblioref" onclick="">2003</a>)</span>, quando dados na variável dependente são removidos, os dados remanescentes não são mais independentes e o erro-padrão fica comprometido</p></li>
+<li class="fragment"><p>Procedimentos da <em>estatística robusta</em> devem ser utilizados, em lugar dos procedimentos clássicos, para evitar esse problema</p></li>
+</ul>
+</section></section>
+<section>
+<section id="revisão-de-estatistica-descritiva" class="title-slide slide level1 center" data-background-image="img/PPT_Chapter.png">
+<h1>Revisão de Estatistica Descritiva</h1>
+
+</section>
+<section id="nivelamento" class="slide level2">
+<h2>Nivelamento</h2>
+<ul>
+<li class="fragment">A média aritmética é um estimador <strong>clássico</strong> de posição:
+<ul>
+<li class="fragment"><span class="math display">\[\hat \mu = \overline X = \frac{1}{n}\sum_{i=1}^n x_i\]</span></li>
+</ul></li>
+<li class="fragment">A mediana é um estimador <strong>robusto</strong> de posição:
+<ul>
+<li class="fragment"><span class="math display">\[\hat \mu = \widetilde{X} =\begin{cases}
+x_{(\frac{n+1}{2})}&amp; \text{se}\;n\;\text{é ímpar} \\
+\frac{1}{2}\left (x_{(\frac{n}{2})} + x_{(\frac{n}{2}+1}) \right )&amp; \text{se}\;n\;\text{é par}
+\end{cases}
+\]</span></li>
+</ul></li>
+<li class="fragment"><blockquote>
+<p>In terms of power, the mean is preferable to the median or 20% trimmed mean when dealing with symmetric distributions for which outliers are rare <span class="citation" data-cites="wilcox2023">(<a href="#/referências" role="doc-biblioref" onclick="">R. R. Wilcox e Rousselet 2023, 13</a>)</span>.</p>
+</blockquote></li>
+</ul>
+</section>
+<section id="nivelamento-1" class="slide level2">
+<h2>Nivelamento</h2>
+<ul>
+<li class="fragment">Da mesma maneira, o desvio-padrão amostral é um estimador <strong>clássico</strong> de dispersão:
+<ul>
+<li class="fragment"><span class="math display">\[\hat \sigma = s = \sqrt{\frac{1}{n-1}\sum_{i=1}^n(x_i - \overline x)^2}\]</span></li>
+</ul></li>
+<li class="fragment">E o <span class="math inline">\(\mathrm{IQR}_n\)</span> é um estimador <strong>robusto</strong> da dispersão:
+<ul>
+<li class="fragment"><span class="math display">\[
+\begin{aligned}
+\hat \sigma = \mathrm{IQR}_n &amp;= \frac{1}{2\phi^{-1}(0,75)}(x_{(n - [n/4]+1)} - x_{([n/4])}) \\
+\mathrm{IQR}_n &amp;\approx 0,7413\cdot(Q_3 - Q_1)
+\end{aligned}
+\]</span></li>
+</ul></li>
+</ul>
+</section>
+<section id="nivelamento-2" class="slide level2 smaller">
+<h2>Nivelamento</h2>
+<ul>
+<li class="fragment">Um bom parâmetro para medir o quanto uma amostra é dispersa é o Coeficiente de Variação (CV):
+<ul>
+<li class="fragment">A análise do parâmetro de dispersão <span class="math inline">\(s\)</span>, por si só, não diz muito, a menos que o comparemos com o parâmetro de posição <span class="math inline">\(\overline X\)</span>.</li>
+<li class="fragment">O coeficiente de variação faz essa comparação:
+<ul>
+<li class="fragment">Para a população: <span class="math display">\[\mathrm{CV} = \frac{\sigma}{\mu}\]</span></li>
+<li class="fragment">Para a amostra: <span class="math display">\[\mathrm{CV} = \frac{s}{\overline X}\]</span></li>
+</ul></li>
+</ul></li>
+<li class="fragment">Podemos também calcular um coeficiente de variação robusto <span class="math inline">\(\mathrm{RCV}\)</span>:
+<ul>
+<li class="fragment"><span class="math display">\[\mathrm{RCV} = \frac{\mathrm{IQR}_n}{ \widetilde{X}}\]</span></li>
+</ul></li>
+</ul>
+</section></section>
+<section>
+<section id="exemplo-1" class="title-slide slide level1 center" data-background-image="img/PPT_Chapter.png">
+<h1>Exemplo 1</h1>
+
+</section>
+<section id="exemplo-1-1" class="slide level2 smaller">
+<h2>Exemplo 1</h2>
+<ul>
+<li class="fragment">Sejam os dados da <a href="#/tbl-PU1" class="quarto-xref">Tabela&nbsp;1</a>:</li>
+</ul>
+<div class="fragment">
+<div class="cell">
+<div id="tbl-PU1" class="cell quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-PU1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;1: Preços Unitários - Amostra Homogênea.
+</figcaption>
+<div aria-describedby="tbl-PU1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 10%">
+<col style="width: 11%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2430,2</td>
+<td style="text-align: right;">4015</td>
+<td style="text-align: right;">6071</td>
+<td style="text-align: right;">2107,2</td>
+<td style="text-align: right;">5790,8</td>
+<td style="text-align: right;">5114,3</td>
+<td style="text-align: right;">5330,8</td>
+<td style="text-align: right;">11552,4</td>
+<td style="text-align: right;">2004,3</td>
+<td style="text-align: right;">12935,4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</div>
+<div class="fragment">
+<h3 id="descrição-da-amostra">Descrição da amostra</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table caption-top" data-quarto-postprocess="true" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Var.</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Média</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Desvio Padrão</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Min.</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Q1</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Mediana</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Q3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Max.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">PU</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">5.735</td>
+<td style="text-align: left;">3.761</td>
+<td style="text-align: left;">2.004</td>
+<td style="text-align: left;">2.826</td>
+<td style="text-align: left;">5.223</td>
+<td style="text-align: left;">6.001</td>
+<td style="text-align: left;">12.935</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li class="fragment">Comparar a média com a mediana!</li>
+<li class="fragment">Perceber que a distância entre
+<ul>
+<li class="fragment">o valor mínimo (2.004) e o primeiro quartil (2.826)</li>
+<li class="fragment">é muito menor que a distância entre o terceiro quartil (6.001) e o valor máximo (12.935)</li>
+</ul></li>
+<li class="fragment">Computar grosseiramente o <span class="math inline">\(\mathrm{IQR}_n \approx 0,75(6001-2826) = 2.381,25\)</span></li>
+<li class="fragment">Comparar este último com o desvio-padrão (<span class="math inline">\(\approx 35\%\)</span> menor)!</li>
+<li class="fragment">Calcular o <span class="math inline">\(\mathrm{CV} = 3.761/5.735 \approx 66\%\)</span></li>
+<li class="fragment">Calcular o <span class="math inline">\(\mathrm{RCV} = 2.381,25/5.223 \approx 46\%\)</span></li>
+</ul>
+</div>
+</section>
+<section id="gráficos" class="slide level2 smaller">
+<h2>Gráficos</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="04_Outliers_files/figure-revealjs/unnamed-chunk-3-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="04_Outliers_files/figure-revealjs/unnamed-chunk-4-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="análise-de-outliers" class="slide level2">
+<h2>Análise de <em>outliers</em></h2>
+<ul>
+<li class="fragment">É usual que detectemos <em>outliers</em> baseado em um critério.
+<ul>
+<li class="fragment">Por exemplo, o critério dos dois desvios-padrões
+<ul>
+<li class="fragment"><span class="math display">\[r_i = \frac{X_i - \overline X}{s}; \; |r_i| &gt; 2,0\]</span></li>
+</ul></li>
+<li class="fragment">Ou o critério de <em>Chauvenet</em>:
+<ul>
+<li class="fragment"><span class="math display">\[r_i = \frac{X_i - \overline X}{s}; \; |r_i| &gt; d/s_{crit}\]</span></li>
+<li class="fragment"><span class="math display">\[d/s_{crit} = |\phi^{-1}(1/4n)|\]</span></li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="análise-de-outliers-1" class="slide level2 smaller">
+<h2>Análise de <em>outliers</em></h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped caption-top" data-quarto-postprocess="true" style="font-size: 20px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PU1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Outlier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">2.004,30</td>
+<td style="text-align: right;">-3.730,84</td>
+<td style="text-align: right;">-0,99</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">2.107,16</td>
+<td style="text-align: right;">-3.627,99</td>
+<td style="text-align: right;">-0,96</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">2.430,23</td>
+<td style="text-align: right;">-3.304,91</td>
+<td style="text-align: right;">-0,88</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">4.015,03</td>
+<td style="text-align: right;">-1.720,12</td>
+<td style="text-align: right;">-0,46</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">5.114,25</td>
+<td style="text-align: right;">-620,89</td>
+<td style="text-align: right;">-0,17</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">5.330,80</td>
+<td style="text-align: right;">-404,34</td>
+<td style="text-align: right;">-0,11</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">5.790,83</td>
+<td style="text-align: right;">55,69</td>
+<td style="text-align: right;">0,01</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">6.071,03</td>
+<td style="text-align: right;">335,89</td>
+<td style="text-align: right;">0,09</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">11.552,43</td>
+<td style="text-align: right;">5.817,29</td>
+<td style="text-align: right;">1,55</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">12.935,36</td>
+<td style="text-align: right;">7.200,22</td>
+<td style="text-align: right;">1,91</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T1/Q2/T2</td>
+<td style="text-align: right;">3.750,89</td>
+<td style="text-align: right;">5.222,52</td>
+<td style="text-align: right;">5.837,53</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mean/SD/CV/SE</td>
+<td style="text-align: right;">5.735,14</td>
+<td style="text-align: right;">3.761,08</td>
+<td style="text-align: right;">65,58</td>
+<td style="text-align: left;">1189.36</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Med/IQRn/RCVq/SE</td>
+<td style="text-align: right;">5.222,52</td>
+<td style="text-align: right;">2.698,93</td>
+<td style="text-align: right;">51,68</td>
+<td style="text-align: left;">1290.12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OS Skew/Moors Kurt.</td>
+<td style="text-align: right;">0,29</td>
+<td style="text-align: right;">2,37</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">d/s_crit</td>
+<td style="text-align: right;">1,96</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section></section>
+<section>
+<section id="mascaramento" class="title-slide slide level1 center" data-background-image="img/PPT_Chapter.png">
+<h1>Mascaramento</h1>
+
+</section>
+<section id="mascaramento-1" class="slide level2 smaller">
+<h2>Mascaramento</h2>
+<ul>
+<li class="fragment"><em>Mascaramento</em> ocorre quando <em>outliers</em> verdadeiros não são detectados</li>
+<li class="fragment"><em>Empoçamento</em> ocorre quando observações regulares são classificadas como <em>outliers</em></li>
+<li class="fragment">Estes fenômenos usualmente ocorrem porque trabalhamos com estatísticas <em>não-robustas</em>, <em>i.e.</em> sensíveis à <em>outliers</em></li>
+<li class="fragment">Mesmo critérios como o critério do <em>boxplot</em> de Tukey, que classifica como possíveis <em>outliers</em> os pontos além de <span class="math inline">\(1,5\cdot \mathrm{IQR}\)</span> dos quartis inferior e superior, estão sujeitos ao mascaramento <span class="citation" data-cites="wilcox2023">(ver <a href="#/referências" role="doc-biblioref" onclick="">R. R. Wilcox e Rousselet 2023, 12</a>)</span>.</li>
+<li class="fragment">A solução é trabalhar com estimadores robustos:
+<ul>
+<li class="fragment">Por exemplo, a mediana (<span class="math inline">\(\widetilde{X}\)</span>) e o desvio mediano absoluto (<span class="math inline">\(\mathrm{MAD}_n\)</span>)
+<ul>
+<li class="fragment"><span class="math display">\[r_i = \frac{X_i -  \widetilde{X}}{\mathrm{MAD}_n}; \; |r_i| &gt; 2,24\]</span></li>
+<li class="fragment"><span class="math display">\[\mathrm{MAD}_n = 1,4826\cdot \mathrm{Med}|X_i -  \widetilde{X}|\]</span></li>
+</ul></li>
+</ul></li>
+<li class="fragment"><blockquote>
+<p>There are two common mistakes regarding how to deal with outliers. The first is to search for outliers using the mean and standard deviation <span class="citation" data-cites="wilcox2023">(<a href="#/referências" role="doc-biblioref" onclick="">R. R. Wilcox e Rousselet 2023, 11</a>)</span>.</p>
+</blockquote></li>
+</ul>
+</section>
+<section id="análise-robusta-de-outliers" class="slide level2 smaller">
+<h2>Análise robusta de <em>outliers</em></h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped caption-top" data-quarto-postprocess="true" style="font-size: 20px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PU1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Robust_Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Outlier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">2.004,30</td>
+<td style="text-align: right;">-3.730,84</td>
+<td style="text-align: right;">-0,99</td>
+<td style="text-align: right;">-3.218,23</td>
+<td style="text-align: right;">-1,09</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">2.107,16</td>
+<td style="text-align: right;">-3.627,99</td>
+<td style="text-align: right;">-0,96</td>
+<td style="text-align: right;">-3.115,37</td>
+<td style="text-align: right;">-1,05</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">2.430,23</td>
+<td style="text-align: right;">-3.304,91</td>
+<td style="text-align: right;">-0,88</td>
+<td style="text-align: right;">-2.792,29</td>
+<td style="text-align: right;">-0,94</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">4.015,03</td>
+<td style="text-align: right;">-1.720,12</td>
+<td style="text-align: right;">-0,46</td>
+<td style="text-align: right;">-1.207,50</td>
+<td style="text-align: right;">-0,41</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">5.114,25</td>
+<td style="text-align: right;">-620,89</td>
+<td style="text-align: right;">-0,17</td>
+<td style="text-align: right;">-108,27</td>
+<td style="text-align: right;">-0,04</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">5.330,80</td>
+<td style="text-align: right;">-404,34</td>
+<td style="text-align: right;">-0,11</td>
+<td style="text-align: right;">108,27</td>
+<td style="text-align: right;">0,04</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">5.790,83</td>
+<td style="text-align: right;">55,69</td>
+<td style="text-align: right;">0,01</td>
+<td style="text-align: right;">568,30</td>
+<td style="text-align: right;">0,19</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">6.071,03</td>
+<td style="text-align: right;">335,89</td>
+<td style="text-align: right;">0,09</td>
+<td style="text-align: right;">848,51</td>
+<td style="text-align: right;">0,29</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">11.552,43</td>
+<td style="text-align: right;">5.817,29</td>
+<td style="text-align: right;">1,55</td>
+<td style="text-align: right;">6.329,90</td>
+<td style="text-align: right;">2,13</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">12.935,36</td>
+<td style="text-align: right;">7.200,22</td>
+<td style="text-align: right;">1,91</td>
+<td style="text-align: right;">7.712,83</td>
+<td style="text-align: right;">2,60</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P10/Q1/Q2/Q3/P90</td>
+<td style="text-align: right;">2.055,73</td>
+<td style="text-align: right;">2.430,23</td>
+<td style="text-align: right;">5.222,52</td>
+<td style="text-align: right;">6.071,03</td>
+<td style="text-align: right;">12.243,89</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mean/SD/CV/CI_L/CI_U</td>
+<td style="text-align: right;">5.735,14</td>
+<td style="text-align: right;">3.761,08</td>
+<td style="text-align: right;">65,58</td>
+<td style="text-align: right;">4.090,22</td>
+<td style="text-align: right;">7.380,06</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Median/MADn/RCVm/CI_L/CI_U</td>
+<td style="text-align: right;">5.222,52</td>
+<td style="text-align: right;">2.965,05</td>
+<td style="text-align: right;">56,77</td>
+<td style="text-align: right;">3.222,63</td>
+<td style="text-align: right;">5.930,93</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">HL/IQRn/RCVq</td>
+<td style="text-align: right;">5.222,52</td>
+<td style="text-align: right;">2.698,93</td>
+<td style="text-align: right;">51,68</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OS Skew/Moors Kurt.</td>
+<td style="text-align: right;">0,29</td>
+<td style="text-align: right;">2,37</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LF/UF</td>
+<td style="text-align: right;">-2,24</td>
+<td style="text-align: right;">2,24</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="análise-robusta-de-outliers-1" class="slide level2 smaller">
+<h2>Análise robusta de <em>outliers</em></h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped caption-top" data-quarto-postprocess="true" style="font-size: 20px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PU1[-c(10)]</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Robust_Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Outlier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">2.004,30</td>
+<td style="text-align: right;">-2.930,82</td>
+<td style="text-align: right;">-0,99</td>
+<td style="text-align: right;">-3.109,95</td>
+<td style="text-align: right;">-1,91</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">2.107,16</td>
+<td style="text-align: right;">-2.827,96</td>
+<td style="text-align: right;">-0,96</td>
+<td style="text-align: right;">-3.007,09</td>
+<td style="text-align: right;">-1,85</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">2.430,23</td>
+<td style="text-align: right;">-2.504,88</td>
+<td style="text-align: right;">-0,85</td>
+<td style="text-align: right;">-2.684,02</td>
+<td style="text-align: right;">-1,65</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">4.015,03</td>
+<td style="text-align: right;">-920,09</td>
+<td style="text-align: right;">-0,31</td>
+<td style="text-align: right;">-1.099,23</td>
+<td style="text-align: right;">-0,67</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">5.114,25</td>
+<td style="text-align: right;">179,13</td>
+<td style="text-align: right;">0,06</td>
+<td style="text-align: right;">0,00</td>
+<td style="text-align: right;">0,00</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">5.330,80</td>
+<td style="text-align: right;">395,68</td>
+<td style="text-align: right;">0,13</td>
+<td style="text-align: right;">216,55</td>
+<td style="text-align: right;">0,13</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">5.790,83</td>
+<td style="text-align: right;">855,71</td>
+<td style="text-align: right;">0,29</td>
+<td style="text-align: right;">676,58</td>
+<td style="text-align: right;">0,42</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">6.071,03</td>
+<td style="text-align: right;">1.135,92</td>
+<td style="text-align: right;">0,38</td>
+<td style="text-align: right;">956,78</td>
+<td style="text-align: right;">0,59</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">11.552,43</td>
+<td style="text-align: right;">6.617,31</td>
+<td style="text-align: right;">2,24</td>
+<td style="text-align: right;">6.438,18</td>
+<td style="text-align: right;">3,95</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P10/Q1/Q2/Q3/P90</td>
+<td style="text-align: right;">2.045,44</td>
+<td style="text-align: right;">2.349,46</td>
+<td style="text-align: right;">5.114,25</td>
+<td style="text-align: right;">5.860,88</td>
+<td style="text-align: right;">9.359,87</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mean/SD/CV/CI_L/CI_U</td>
+<td style="text-align: right;">4.935,12</td>
+<td style="text-align: right;">2.951,86</td>
+<td style="text-align: right;">59,81</td>
+<td style="text-align: right;">3.560,71</td>
+<td style="text-align: right;">6.309,52</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Median/MADn/RCVm/CI_L/CI_U</td>
+<td style="text-align: right;">5.114,25</td>
+<td style="text-align: right;">1.629,71</td>
+<td style="text-align: right;">31,87</td>
+<td style="text-align: right;">2.430,23</td>
+<td style="text-align: right;">5.790,83</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">HL/IQRn/RCVq</td>
+<td style="text-align: right;">4.564,64</td>
+<td style="text-align: right;">2.603,01</td>
+<td style="text-align: right;">50,90</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OS Skew/Moors Kurt.</td>
+<td style="text-align: right;">-0,52</td>
+<td style="text-align: right;">0,79</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LF/UF</td>
+<td style="text-align: right;">-2,24</td>
+<td style="text-align: right;">2,24</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="análise-robusta-de-outliers-2" class="slide level2 smaller">
+<h2>Análise robusta de <em>outliers</em></h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped caption-top" data-quarto-postprocess="true" style="font-size: 20px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PU1[-c(8, 10)]</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Robust_Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Outlier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">2.004,30</td>
+<td style="text-align: right;">-2.103,65</td>
+<td style="text-align: right;">-1,23</td>
+<td style="text-align: right;">-2.560,34</td>
+<td style="text-align: right;">-1,26</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">2.107,16</td>
+<td style="text-align: right;">-2.000,80</td>
+<td style="text-align: right;">-1,17</td>
+<td style="text-align: right;">-2.457,48</td>
+<td style="text-align: right;">-1,21</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">2.430,23</td>
+<td style="text-align: right;">-1.677,72</td>
+<td style="text-align: right;">-0,98</td>
+<td style="text-align: right;">-2.134,40</td>
+<td style="text-align: right;">-1,05</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">4.015,03</td>
+<td style="text-align: right;">-92,93</td>
+<td style="text-align: right;">-0,05</td>
+<td style="text-align: right;">-549,61</td>
+<td style="text-align: right;">-0,27</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">5.114,25</td>
+<td style="text-align: right;">1.006,30</td>
+<td style="text-align: right;">0,59</td>
+<td style="text-align: right;">549,61</td>
+<td style="text-align: right;">0,27</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">5.330,80</td>
+<td style="text-align: right;">1.222,85</td>
+<td style="text-align: right;">0,72</td>
+<td style="text-align: right;">766,16</td>
+<td style="text-align: right;">0,38</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">5.790,83</td>
+<td style="text-align: right;">1.682,87</td>
+<td style="text-align: right;">0,98</td>
+<td style="text-align: right;">1.226,19</td>
+<td style="text-align: right;">0,61</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">6.071,03</td>
+<td style="text-align: right;">1.963,08</td>
+<td style="text-align: right;">1,15</td>
+<td style="text-align: right;">1.506,40</td>
+<td style="text-align: right;">0,74</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P10/Q1/Q2/Q3/P90</td>
+<td style="text-align: right;">2.035,16</td>
+<td style="text-align: right;">2.268,70</td>
+<td style="text-align: right;">4.564,64</td>
+<td style="text-align: right;">5.560,81</td>
+<td style="text-align: right;">5.986,97</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mean/SD/CV/CI_L/CI_U</td>
+<td style="text-align: right;">4.107,95</td>
+<td style="text-align: right;">1.709,04</td>
+<td style="text-align: right;">41,60</td>
+<td style="text-align: right;">3.253,01</td>
+<td style="text-align: right;">4.962,90</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Median/MADn/RCVm/CI_L/CI_U</td>
+<td style="text-align: right;">4.564,64</td>
+<td style="text-align: right;">2.025,67</td>
+<td style="text-align: right;">44,38</td>
+<td style="text-align: right;">2.430,23</td>
+<td style="text-align: right;">5.330,80</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">HL/IQRn/RCVq</td>
+<td style="text-align: right;">4.026,35</td>
+<td style="text-align: right;">2.440,45</td>
+<td style="text-align: right;">53,46</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OS Skew/Moors Kurt.</td>
+<td style="text-align: right;">-0,32</td>
+<td style="text-align: right;">0,63</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LF/UF</td>
+<td style="text-align: right;">-2,24</td>
+<td style="text-align: right;">2,24</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<ul>
+<li class="fragment">A média, que antes estava inflada, agora é menor do que a mediana</li>
+<li class="fragment">A nova mediana não é mais a mediana “real” da amostra.</li>
+</ul>
+</section></section>
+<section>
+<section id="estatística-robusta" class="title-slide slide level1 center" data-background-image="img/PPT_Chapter.png">
+<h1>Estatística Robusta</h1>
+
+</section>
+<section id="estatísticas-robustas" class="slide level2 smaller">
+<h2>Estatísticas Robustas</h2>
+<ul>
+<li class="fragment"><p>Existem diversas estatísticas robustas, tanto para a medida de posição, como a mediana, como para a medida de dispersão, como o <span class="math inline">\(\mathrm{MAD}_n\)</span>.</p></li>
+<li class="fragment"><p>Dentre as estatísticas robustas, destacamos a <strong>média aparada</strong>, que é uma espécie de compromisso entre a média e a mediana</p>
+<ul>
+<li class="fragment">Todas as observações são utilizadas para o cômputo da média, nenhuma é descartada</li>
+<li class="fragment">Apenas uma (ou duas, no caso de amostras de tamnho par) observação é utilizada no cômputo da mediana, as outas são descartadas</li>
+<li class="fragment">Na <strong>média aparada</strong>, descartamos uma fração menor de dados do que no cômputo da mediana.
+<ul>
+<li class="fragment">Por exemplo, na média aparada de 20%, <span class="math inline">\(\overline X_{20}\)</span>, descartamos 20% dos dados em cada extremo da amostra</li>
+<li class="fragment">Na média aparada de 25%, <span class="math inline">\(\overline X_{25}\)</span>, descartamos 25% dos dados em cada extremo da amostra</li>
+</ul></li>
+</ul></li>
+<li class="fragment"><p>Segundo <span class="citation" data-cites="wilcox2023">R. R. Wilcox e Rousselet (<a href="#/referências" role="doc-biblioref" onclick="">2023</a>)</span>, é conveniente utilizar a média aparada, pois o erro-padrão e os testes de hipóteses calculados após o descarte de <em>outliers</em> podem estar subestimados.</p></li>
+<li class="fragment"><blockquote>
+<p>The second mistake is discarding outliers and applying some standard method for comparing means using the remaining data. This results in an incorrect estimate of the standard error, regardless of how large the sample size might be <span class="citation" data-cites="wilcox2023">(<a href="#/referências" role="doc-biblioref" onclick="">R. R. Wilcox e Rousselet 2023, 12</a>)</span>.</p>
+</blockquote></li>
+</ul>
+</section>
+<section id="média-aparada" class="slide level2 smaller">
+<h2>Média Aparada</h2>
+<ul>
+<li class="fragment">A média de uma amostra <span class="math inline">\(X = \{2, 4, 6, 8, 10, 20\}\)</span> é:
+<ul>
+<li class="fragment"><span class="math inline">\(\overline X = (2+4+6+8+10+20)/6 = 8,33\)</span>
+<ul>
+<li class="fragment">Todos os pontos são utilizados no cálculo da média, nenhum é descartado.</li>
+</ul></li>
+</ul></li>
+<li class="fragment">A mediana dessa mesma amostra é:
+<ul>
+<li class="fragment"><span class="math inline">\(\widetilde{X} = (6+8)/2 = 7\)</span>
+<ul>
+<li class="fragment">Ou seja, 4 dados são descartados, 2 em cada extremo da amostra, e 2 dados centrais são utilizados para o cômputo da mediana</li>
+</ul></li>
+</ul></li>
+<li class="fragment">A média aparada de 20% descarta 1 dado em cada extremo da amostra (não é possível descartar 1,2 dados):
+<ul>
+<li class="fragment"><span class="math inline">\(\overline X_{20} = (4+6+8+10)/4 = 7\)</span></li>
+</ul></li>
+<li class="fragment">Perceber que se <span class="math inline">\(X = \{-10, 4, 6, 8, 10, 20\}\)</span>, tanto <span class="math inline">\(\widetilde{X}\)</span> quanto <span class="math inline">\(\overline X_{20}\)</span> se manteriam as mesmas.
+<ul>
+<li class="fragment">Ambas as medidas são robustas
+<ul>
+<li class="fragment"><span class="math inline">\(\widetilde{X}\)</span> é mais robusta, pois 2 dados em cada extremo podem estar contaminados, e ela ainda assim não se altera</li>
+<li class="fragment"><span class="math inline">\(\overline X_{20}\)</span>, neste caso, só é robusta à contaminação de 1 dado em cada extremo da amostra.</li>
+<li class="fragment"><span class="math inline">\(\overline X\)</span> é sensível a qualquer ponto de contaminação!</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="análise-robusta-de-outliers-3" class="slide level2 smaller">
+<h2>Análise robusta de <em>outliers</em></h2>
+<div class="cell">
+<div id="tbl-TrimmedMean" class="cell quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-TrimmedMean-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;2: Análise dos dados com média aparada (30%)
+</figcaption>
+<div aria-describedby="tbl-TrimmedMean-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table table-striped do-not-create-environment cell caption-top" data-quarto-postprocess="true" style="font-size: 20px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PU1</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Robust_Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Outlier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">2.004,30</td>
+<td style="text-align: right;">-3.058,43</td>
+<td style="text-align: right;">-1,75</td>
+<td style="text-align: right;">-3.218,23</td>
+<td style="text-align: right;">-1,09</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">2.107,16</td>
+<td style="text-align: right;">-2.955,57</td>
+<td style="text-align: right;">-1,69</td>
+<td style="text-align: right;">-3.115,37</td>
+<td style="text-align: right;">-1,05</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">2.430,23</td>
+<td style="text-align: right;">-2.632,49</td>
+<td style="text-align: right;">-1,50</td>
+<td style="text-align: right;">-2.792,29</td>
+<td style="text-align: right;">-0,94</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">4.015,03</td>
+<td style="text-align: right;">-1.047,70</td>
+<td style="text-align: right;">-0,60</td>
+<td style="text-align: right;">-1.207,50</td>
+<td style="text-align: right;">-0,41</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">5.114,25</td>
+<td style="text-align: right;">51,53</td>
+<td style="text-align: right;">0,03</td>
+<td style="text-align: right;">-108,27</td>
+<td style="text-align: right;">-0,04</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">5.330,80</td>
+<td style="text-align: right;">268,07</td>
+<td style="text-align: right;">0,15</td>
+<td style="text-align: right;">108,27</td>
+<td style="text-align: right;">0,04</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">5.790,83</td>
+<td style="text-align: right;">728,10</td>
+<td style="text-align: right;">0,42</td>
+<td style="text-align: right;">568,30</td>
+<td style="text-align: right;">0,19</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">6.071,03</td>
+<td style="text-align: right;">1.008,31</td>
+<td style="text-align: right;">0,58</td>
+<td style="text-align: right;">848,51</td>
+<td style="text-align: right;">0,29</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">11.552,43</td>
+<td style="text-align: right;">6.489,70</td>
+<td style="text-align: right;">3,71</td>
+<td style="text-align: right;">6.329,90</td>
+<td style="text-align: right;">2,13</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">12.935,36</td>
+<td style="text-align: right;">7.872,63</td>
+<td style="text-align: right;">4,50</td>
+<td style="text-align: right;">7.712,83</td>
+<td style="text-align: right;">2,60</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P10/Q1/Q2/Q3/P90</td>
+<td style="text-align: right;">2.055,73</td>
+<td style="text-align: right;">2.430,23</td>
+<td style="text-align: right;">5.222,52</td>
+<td style="text-align: right;">6.071,03</td>
+<td style="text-align: right;">12.243,89</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mean/SD/CV/CI_L/CI_U</td>
+<td style="text-align: right;">5.062,73</td>
+<td style="text-align: right;">1.750,45</td>
+<td style="text-align: right;">34,58</td>
+<td style="text-align: right;">3.740,45</td>
+<td style="text-align: right;">6.385,00</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Median/MADn/RCVm/CI_L/CI_U</td>
+<td style="text-align: right;">5.222,52</td>
+<td style="text-align: right;">2.965,05</td>
+<td style="text-align: right;">56,77</td>
+<td style="text-align: right;">3.772,24</td>
+<td style="text-align: right;">5.930,93</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">HL/IQRn/RCVq</td>
+<td style="text-align: right;">5.222,52</td>
+<td style="text-align: right;">2.698,93</td>
+<td style="text-align: right;">51,68</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OS Skew/Moors Kurt.</td>
+<td style="text-align: right;">0,29</td>
+<td style="text-align: right;">2,37</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LF/UF</td>
+<td style="text-align: right;">-2,24</td>
+<td style="text-align: right;">2,24</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="o-que-é-estimado-com-a-média-aparada" class="slide level2">
+<h2>O que é estimado com a média aparada?</h2>
+<ul>
+<li class="fragment"><p>Segundo <span class="citation" data-cites="wilcox2003">R. Wilcox e Keselman (<a href="#/referências" role="doc-biblioref" onclick="">2003</a>)</span>, se a distribuição dos dados é normal, então a média aparada estima o parâmetro de posição da distribuição normal. Para toda distribuição simétrica dos dados, ocorre o mesmo.</p></li>
+<li class="fragment"><p>No entanto, se os dados são assimétricos, a média aparada é uma medida que vai estar localizada mais próxima da massa central dos dados, entre a mediana e a média.</p></li>
+<li class="fragment"><blockquote>
+<p>If the distributions are skewed, the median and 20% trimmed mean can better reflect what is typical, and improved control over the Type I error probability can be achieved. When outliers occur, there is the possibility that the mean will have a much larger standard error than the median or 20% trimmed mean <span class="citation" data-cites="wilcox2023">(<a href="#/referências" role="doc-biblioref" onclick="">R. R. Wilcox e Rousselet 2023, 13</a>)</span>.</p>
+</blockquote></li>
+</ul>
+</section>
+<section id="o-que-é-estimado-com-a-média-aparada-1" class="slide level2">
+<h2>O que é estimado com a média aparada?</h2>
+
+<img data-src="img/TrimmedMean_Normal.png" class="r-stretch"></section>
+<section id="o-que-é-estimado-com-a-média-aparada-2" class="slide level2">
+<h2>O que é estimado com a média aparada?</h2>
+
+<img data-src="img/TrimmedMean_Lognormal.png" class="r-stretch"></section></section>
+<section>
+<section id="exemplo-2" class="title-slide slide level1 center" data-background-image="img/PPT_Chapter.png">
+<h1>Exemplo 2</h1>
+
+</section>
+<section id="exemplo-2-1" class="slide level2 smaller">
+<h2>Exemplo 2</h2>
+<ul>
+<li class="fragment">Sejam os dados da <a href="#/tbl-PU2" class="quarto-xref">Tabela&nbsp;3</a></li>
+</ul>
+<div class="fragment">
+<div class="cell">
+<div id="tbl-PU2" class="cell quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-PU2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;3: Preços Unitários - Amostra Homogênea.
+</figcaption>
+<div aria-describedby="tbl-PU2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 8%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2927,6</td>
+<td style="text-align: right;">4880,2</td>
+<td style="text-align: right;">9468,2</td>
+<td style="text-align: right;">2621,9</td>
+<td style="text-align: right;">4305,8</td>
+<td style="text-align: right;">4760,8</td>
+<td style="text-align: right;">6248,2</td>
+<td style="text-align: right;">3993,4</td>
+<td style="text-align: right;">11419,2</td>
+<td style="text-align: right;">4188,3</td>
+<td style="text-align: right;">5447,5</td>
+<td style="text-align: right;">7110,9</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</div>
+<div class="fragment">
+<h3 id="descrição-da-amostra-1">Descrição da amostra</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table caption-top" data-quarto-postprocess="true" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Var.</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Média</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Desvio Padrão</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Min.</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Q1</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Mediana</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Q3</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Max.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">PU</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">5.614</td>
+<td style="text-align: left;">2.612</td>
+<td style="text-align: left;">2.622</td>
+<td style="text-align: left;">4.140</td>
+<td style="text-align: left;">4.821</td>
+<td style="text-align: left;">6.464</td>
+<td style="text-align: left;">11.419</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="gráficos-1" class="slide level2">
+<h2>Gráficos</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="04_Outliers_files/figure-revealjs/unnamed-chunk-10-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="04_Outliers_files/figure-revealjs/unnamed-chunk-11-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="análise-de-outliers-2" class="slide level2 smaller">
+<h2>Análise de <em>outliers</em></h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped caption-top" data-quarto-postprocess="true" style="font-size: 20px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PU2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Outlier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">2.621,90</td>
+<td style="text-align: right;">-2.992,43</td>
+<td style="text-align: right;">-1,15</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">2.927,59</td>
+<td style="text-align: right;">-2.686,73</td>
+<td style="text-align: right;">-1,03</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">3.993,38</td>
+<td style="text-align: right;">-1.620,95</td>
+<td style="text-align: right;">-0,62</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">4.188,35</td>
+<td style="text-align: right;">-1.425,98</td>
+<td style="text-align: right;">-0,55</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">4.305,77</td>
+<td style="text-align: right;">-1.308,55</td>
+<td style="text-align: right;">-0,50</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">4.760,82</td>
+<td style="text-align: right;">-853,51</td>
+<td style="text-align: right;">-0,33</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">4.880,20</td>
+<td style="text-align: right;">-734,13</td>
+<td style="text-align: right;">-0,28</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">11</td>
+<td style="text-align: right;">5.447,50</td>
+<td style="text-align: right;">-166,83</td>
+<td style="text-align: right;">-0,06</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">6.248,18</td>
+<td style="text-align: right;">633,86</td>
+<td style="text-align: right;">0,24</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">12</td>
+<td style="text-align: right;">7.110,89</td>
+<td style="text-align: right;">1.496,56</td>
+<td style="text-align: right;">0,57</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">9.468,15</td>
+<td style="text-align: right;">3.853,83</td>
+<td style="text-align: right;">1,48</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">11.419,17</td>
+<td style="text-align: right;">5.804,84</td>
+<td style="text-align: right;">2,22</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T1/Q2/T2</td>
+<td style="text-align: right;">4.247,06</td>
+<td style="text-align: right;">4.820,51</td>
+<td style="text-align: right;">5.847,84</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mean/SD/CV/SE</td>
+<td style="text-align: right;">5.614,32</td>
+<td style="text-align: right;">2.611,71</td>
+<td style="text-align: right;">46,52</td>
+<td style="text-align: left;">753.94</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Med/IQRn/RCVq/SE</td>
+<td style="text-align: right;">4.820,51</td>
+<td style="text-align: right;">1.918,99</td>
+<td style="text-align: right;">37,32</td>
+<td style="text-align: left;">656.39</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OS Skew/Moors Kurt.</td>
+<td style="text-align: right;">0,43</td>
+<td style="text-align: right;">1,83</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">d/s_crit</td>
+<td style="text-align: right;">2,04</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="º-passo" class="slide level2 smaller">
+<h2>2º Passo</h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped caption-top" data-quarto-postprocess="true" style="font-size: 20px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PU2[-9]</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Outlier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">2.621,90</td>
+<td style="text-align: right;">-2.464,71</td>
+<td style="text-align: right;">-1,26</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">2.927,59</td>
+<td style="text-align: right;">-2.159,02</td>
+<td style="text-align: right;">-1,10</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">3.993,38</td>
+<td style="text-align: right;">-1.093,23</td>
+<td style="text-align: right;">-0,56</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">4.188,35</td>
+<td style="text-align: right;">-898,27</td>
+<td style="text-align: right;">-0,46</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">4.305,77</td>
+<td style="text-align: right;">-780,84</td>
+<td style="text-align: right;">-0,40</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">4.760,82</td>
+<td style="text-align: right;">-325,80</td>
+<td style="text-align: right;">-0,17</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">4.880,20</td>
+<td style="text-align: right;">-206,41</td>
+<td style="text-align: right;">-0,11</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">5.447,50</td>
+<td style="text-align: right;">360,89</td>
+<td style="text-align: right;">0,18</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">6.248,18</td>
+<td style="text-align: right;">1.161,57</td>
+<td style="text-align: right;">0,59</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">11</td>
+<td style="text-align: right;">7.110,89</td>
+<td style="text-align: right;">2.024,28</td>
+<td style="text-align: right;">1,03</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">9.468,15</td>
+<td style="text-align: right;">4.381,54</td>
+<td style="text-align: right;">2,24</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T1/Q2/T2</td>
+<td style="text-align: right;">4.207,92</td>
+<td style="text-align: right;">4.760,82</td>
+<td style="text-align: right;">5.352,95</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mean/SD/CV/SE</td>
+<td style="text-align: right;">5.086,61</td>
+<td style="text-align: right;">1.956,32</td>
+<td style="text-align: right;">38,46</td>
+<td style="text-align: left;">589.85</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Med/IQRn/RCVq/SE</td>
+<td style="text-align: right;">4.760,82</td>
+<td style="text-align: right;">1.486,97</td>
+<td style="text-align: right;">30,70</td>
+<td style="text-align: left;">595.17</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OS Skew/Moors Kurt.</td>
+<td style="text-align: right;">0,15</td>
+<td style="text-align: right;">1,68</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">d/s_crit</td>
+<td style="text-align: right;">2,00</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="º-passo-1" class="slide level2 smaller">
+<h2>3º Passo</h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped caption-top" data-quarto-postprocess="true" style="font-size: 20px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PU2[-c(3, 9)]</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Outlier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">2.621,90</td>
+<td style="text-align: right;">-2.026,56</td>
+<td style="text-align: right;">-1,47</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">2.927,59</td>
+<td style="text-align: right;">-1.720,86</td>
+<td style="text-align: right;">-1,25</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">3.993,38</td>
+<td style="text-align: right;">-655,08</td>
+<td style="text-align: right;">-0,47</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">4.188,35</td>
+<td style="text-align: right;">-460,11</td>
+<td style="text-align: right;">-0,33</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">4.305,77</td>
+<td style="text-align: right;">-342,68</td>
+<td style="text-align: right;">-0,25</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">4.760,82</td>
+<td style="text-align: right;">112,36</td>
+<td style="text-align: right;">0,08</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">4.880,20</td>
+<td style="text-align: right;">231,74</td>
+<td style="text-align: right;">0,17</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">5.447,50</td>
+<td style="text-align: right;">799,04</td>
+<td style="text-align: right;">0,58</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">6.248,18</td>
+<td style="text-align: right;">1.599,72</td>
+<td style="text-align: right;">1,16</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">7.110,89</td>
+<td style="text-align: right;">2.462,43</td>
+<td style="text-align: right;">1,78</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T1/Q2/T2</td>
+<td style="text-align: right;">4.155,85</td>
+<td style="text-align: right;">4.533,29</td>
+<td style="text-align: right;">4.974,75</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mean/SD/CV/SE</td>
+<td style="text-align: right;">4.648,46</td>
+<td style="text-align: right;">1.380,58</td>
+<td style="text-align: right;">29,70</td>
+<td style="text-align: left;">436.58</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Med/IQRn/RCVq/SE</td>
+<td style="text-align: right;">4.533,29</td>
+<td style="text-align: right;">1.077,94</td>
+<td style="text-align: right;">23,50</td>
+<td style="text-align: left;">460.27</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">OS Skew/Moors Kurt.</td>
+<td style="text-align: right;">0,05</td>
+<td style="text-align: right;">1,97</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">d/s_crit</td>
+<td style="text-align: right;">1,96</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="alternativa-robusta" class="slide level2 smaller">
+<h2>Alternativa Robusta</h2>
+<div class="cell">
+<div id="tbl-Exemplo2" class="cell quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-Exemplo2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;4: Cálculo com média aparada a 25%.
+</figcaption>
+<div aria-describedby="tbl-Exemplo2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table table-striped do-not-create-environment cell caption-top" data-quarto-postprocess="true" style="font-size: 18px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">PU2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Z</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviation2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Robust_Z</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Outlier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: right;">2.621,90</td>
+<td style="text-align: right;">-2.349,90</td>
+<td style="text-align: right;">-1,87</td>
+<td style="text-align: right;">-2.198,61</td>
+<td style="text-align: right;">-1,32</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: right;">2.927,59</td>
+<td style="text-align: right;">-2.044,21</td>
+<td style="text-align: right;">-1,62</td>
+<td style="text-align: right;">-1.892,91</td>
+<td style="text-align: right;">-1,13</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: right;">3.993,38</td>
+<td style="text-align: right;">-978,42</td>
+<td style="text-align: right;">-0,78</td>
+<td style="text-align: right;">-827,13</td>
+<td style="text-align: right;">-0,49</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">4.188,35</td>
+<td style="text-align: right;">-783,46</td>
+<td style="text-align: right;">-0,62</td>
+<td style="text-align: right;">-632,16</td>
+<td style="text-align: right;">-0,38</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: right;">4.305,77</td>
+<td style="text-align: right;">-666,03</td>
+<td style="text-align: right;">-0,53</td>
+<td style="text-align: right;">-514,73</td>
+<td style="text-align: right;">-0,31</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: right;">4.760,82</td>
+<td style="text-align: right;">-210,99</td>
+<td style="text-align: right;">-0,17</td>
+<td style="text-align: right;">-59,69</td>
+<td style="text-align: right;">-0,04</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: right;">4.880,20</td>
+<td style="text-align: right;">-91,61</td>
+<td style="text-align: right;">-0,07</td>
+<td style="text-align: right;">59,69</td>
+<td style="text-align: right;">0,04</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">11</td>
+<td style="text-align: right;">5.447,50</td>
+<td style="text-align: right;">475,70</td>
+<td style="text-align: right;">0,38</td>
+<td style="text-align: right;">626,99</td>
+<td style="text-align: right;">0,38</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: right;">6.248,18</td>
+<td style="text-align: right;">1.276,38</td>
+<td style="text-align: right;">1,01</td>
+<td style="text-align: right;">1.427,68</td>
+<td style="text-align: right;">0,85</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">12</td>
+<td style="text-align: right;">7.110,89</td>
+<td style="text-align: right;">2.139,09</td>
+<td style="text-align: right;">1,70</td>
+<td style="text-align: right;">2.290,38</td>
+<td style="text-align: right;">1,37</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: right;">9.468,15</td>
+<td style="text-align: right;">4.496,35</td>
+<td style="text-align: right;">3,57</td>
+<td style="text-align: right;">4.647,65</td>
+<td style="text-align: right;">2,78</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">9</td>
+<td style="text-align: right;">11.419,17</td>
+<td style="text-align: right;">6.447,37</td>
+<td style="text-align: right;">5,12</td>
+<td style="text-align: right;">6.598,66</td>
+<td style="text-align: right;">3,95</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P10/Q1/Q2/Q3/P90</td>
+<td style="text-align: right;">2.835,89</td>
+<td style="text-align: right;">4.090,86</td>
+<td style="text-align: right;">4.820,51</td>
+<td style="text-align: right;">6.679,53</td>
+<td style="text-align: right;">10.053,46</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mean/SD/CV/CI_L/CI_U</td>
+<td style="text-align: right;">4.971,80</td>
+<td style="text-align: right;">1.258,84</td>
+<td style="text-align: right;">25,32</td>
+<td style="text-align: right;">4.073,75</td>
+<td style="text-align: right;">5.869,85</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Median/MADn/RCVm/CI_L/CI_U</td>
+<td style="text-align: right;">4.820,51</td>
+<td style="text-align: right;">1.671,49</td>
+<td style="text-align: right;">34,67</td>
+<td style="text-align: right;">4.247,06</td>
+<td style="text-align: right;">5.847,84</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">HL/IQRn/RCVq</td>
+<td style="text-align: right;">5.142,31</td>
+<td style="text-align: right;">1.918,99</td>
+<td style="text-align: right;">39,81</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">OS Skew/Moors Kurt.</td>
+<td style="text-align: right;">0,43</td>
+<td style="text-align: right;">1,83</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LF/UF</td>
+<td style="text-align: right;">-2,24</td>
+<td style="text-align: right;">2,24</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section></section>
+<section>
+<section id="o-critério-de-chauvenet-modificado" class="title-slide slide level1 center" data-background-image="img/PPT_Chapter.png">
+<h1>O critério de Chauvenet modificado</h1>
+
+</section>
+<section id="o-diagrama-de-caixa-de-chauvenet" class="slide level2">
+<h2>O Diagrama de Caixa de Chauvenet</h2>
+<ul>
+<li class="fragment">O diagrama de caixa de Chauvenet de <span class="citation" data-cites="lin2025">Lin, Zhang, e Tong (<a href="#/referências" role="doc-biblioref" onclick="">2025</a>)</span>:</li>
+</ul>
+<div class="fragment">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="04_Outliers_files/figure-revealjs/unnamed-chunk-15-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="o-diagrama-de-caixa-de-tukey" class="slide level2">
+<h2>O Diagrama de Caixa de Tukey</h2>
+<ul>
+<li class="fragment"><span class="citation" data-cites="lin2025">Lin, Zhang, e Tong (<a href="#/referências" role="doc-biblioref" onclick="">2025</a>)</span> modificaram o critério de Chauvenet com a finalidade de modificar o critério das cercas do diagrama de caixa de Tukey
+<ul>
+<li class="fragment">No diagrama de caixa de Tukey, os bigodes se extendem até LF e UF:
+<ul>
+<li class="fragment"><span class="math inline">\(\mathrm{LF} = Q_1 - k\cdot\mathrm{IQR}\)</span></li>
+<li class="fragment"><span class="math inline">\(\mathrm{UF} = Q_3 + k\cdot\mathrm{IQR}\)</span></li>
+<li class="fragment">É usual que se utilize <span class="math inline">\(k = 1,5\)</span></li>
+<li class="fragment">Além de LF e UF os pontos são considerados prováveis <em>outliers</em> e plotados individualmente</li>
+<li class="fragment">Com <span class="math inline">\(k = 3\)</span> tem-se os limites LF e UF além dos quais estão os <em>outliers</em> extremos.</li>
+</ul></li>
+<li class="fragment">Um problema com o diagrama de caixa de Tukey é que o critério apresentado não leva em conta o tamanho da amostra</li>
+</ul></li>
+</ul>
+</section>
+<section id="o-diagrama-de-caixa-de-chauvenet-1" class="slide level2 smaller">
+<h2>O Diagrama de Caixa de Chauvenet</h2>
+<ul>
+<li class="fragment">Com o diagrama de Caixa de Chauvenet é possível levar em conta o tamanho da amostra na identificação dos <em>outliers</em>
+<ul>
+<li class="fragment">No diagrama de caixa de Chauvenet, os bigodes se extendem até LF e UF:
+<ul>
+<li class="fragment"><span class="math inline">\(\mathrm{LF} = Q_1 - k_n^{Chau}\cdot\mathrm{IQR}\)</span></li>
+<li class="fragment"><span class="math inline">\(\mathrm{UF} = Q_3 + k_n^{Chau}\cdot\mathrm{IQR}\)</span></li>
+<li class="fragment"><span class="math inline">\(k_n^{Chau} = \frac{\phi^{-1}(1-0,25/n)}{1,35}-0,5\)</span></li>
+</ul></li>
+<li class="fragment">Exemplo:
+<ul>
+<li class="fragment"><span class="math inline">\(\overline X = 5.000, Q_1 = 4.000; \; Q_3 = 6.500; n=12\)</span></li>
+<li class="fragment"><span class="math inline">\(k_n^{Chau} = \frac{\phi^{-1}(1-0,25/12)}{1,35}-0,5 =1,00\)</span></li>
+<li class="fragment"><span class="math inline">\(\mathrm{LF} = 4.000 - 1,00(6.500-4.000) = 1.500\)</span></li>
+<li class="fragment"><span class="math inline">\(\mathrm{UF} = 6.500 + 1,00(6.500-4.000) = 9.000\)</span></li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="o-diagrama-de-caixa-de-chauvenet-2" class="slide level2 smaller">
+<h2>O Diagrama de Caixa de Chauvenet</h2>
+
+<img data-src="04_Outliers_files/figure-revealjs/unnamed-chunk-16-1.png" width="960" class="r-stretch"></section></section>
+<section>
+<section id="considerações-finais" class="title-slide slide level1 center" data-background-image="img/PPT_Chapter.png">
+<h1>Considerações Finais</h1>
+
+</section>
+<section id="considerações-finais-1" class="slide level2 smaller">
+<h2>Considerações Finais</h2>
+<ul>
+<li class="fragment"><p>Cuidado com o procedimento padrão de remoção de <em>outliers</em>, seja com qual critério for. Apesar de válido, este procedimento gera erros-padrões usualmente subestimados, que irão levar à intervalos de confiança e testes de hipóteses inválidos!</p></li>
+<li class="fragment"><blockquote>
+<p>Rather than use means, trimmed means, or the median, another approach is to use an estimator that down-weights or eliminates outliers. For example, use the MAD-median to search for outliers, remove any that are found, and average the remaining values. This is generally known as a modified one-step Mestimator (MOM). <strong>There is a method for estimating the standard error, but currently a percentile bootstrap method seems preferable when testing hypotheses</strong>. This approach might seem preferable to using a trimmed mean or median because trimming can eliminate points that are not outliers. But this issue is far from simple. Indeed, there are indications that when testing hypotheses, the expectation is that a trimmed mean or median will perform better in terms of Type I errors and power (Wilcox, 2022a). However, there are exceptions: no single estimator dominates. As previously noted, <strong>an invalid strategy is to eliminate extreme values and apply conventional methods for means based on the remaining data because the wrong standard error is used</strong>. Switching to a percentile bootstrap deals with this issue when using MOM as well as related estimators <span class="citation" data-cites="wilcox2023">(<a href="#/referências" role="doc-biblioref" onclick="">R. R. Wilcox e Rousselet 2023, 16</a>)</span>.</p>
+</blockquote></li>
+</ul>
+</section></section>
+<section>
+<section id="obrigado" class="title-slide slide level1 center" data-background-image="img/PPT_Chapter.png">
+<h1>Obrigado!</h1>
+<p><a href="mailto:lfpdroubi@gmail.com" class="email">lfpdroubi@gmail.com</a></p>
+</section>
+<section id="referências" class="slide level2 smaller scrollable">
+<h2>Referências</h2>
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-lin2025" class="csl-entry" role="listitem">
+Lin, Hongmei, Riquan Zhang, e Tiejun Tong. 2025. <span>«When Tukey meets Chauvenet: a new boxplot criterion for outlier detection»</span>. <a href="https://arxiv.org/abs/2506.06491">https://arxiv.org/abs/2506.06491</a>.
+</div>
+<div id="ref-wilcox2023" class="csl-entry" role="listitem">
+Wilcox, Rand R., e Guillaume A. Rousselet. 2023. <span>«An Updated Guide to Robust Statistical Methods in Neuroscience»</span>. <em>Current Protocols</em> 3 (3): e719. https://doi.org/<a href="https://doi.org/10.1002/cpz1.719">https://doi.org/10.1002/cpz1.719</a>.
+</div>
+<div id="ref-wilcox2003" class="csl-entry" role="listitem">
+Wilcox, Rand, e Harvey Keselman. 2003. <span>«Modem Robust Data Analysis Methods: Measures of Central Tendency»</span>. <em>Psychological methods</em> 8 (setembro): 254–74. <a href="https://doi.org/10.1037/1082-989X.8.3.254">https://doi.org/10.1037/1082-989X.8.3.254</a>.
+</div>
+</div>
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<p><img src="img/logo.png" class="slide-logo"></p>
+<div class="footer footer-default">
+<p>VALORÍSTICA</p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="04_Outliers_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="04_Outliers_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="04_Outliers_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="04_Outliers_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="04_Outliers_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="04_Outliers_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="04_Outliers_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="04_Outliers_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="04_Outliers_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="04_Outliers_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script type="text/javascript" charset="utf-8">
+
+      function add_custom_footer() {
+
+        let title_slide = document.querySelector("section#title-slide");
+
+        let title_slide_footer = title_slide.getAttribute('data-footer');
+
+        let footer = document.querySelector('div.footer p');
+
+        let global_footer_text = footer.innerHTML;
+
+    
+
+        if (title_slide.classList.contains('present')) {
+
+          footer.innerHTML = title_slide_footer;
+
+        }
+
+    
+
+        Reveal.on( 'slidechanged' , event => {
+
+            if (event.currentSlide.matches('#title-slide')) {
+
+              footer.innerHTML = title_slide_footer;
+
+            } else {
+
+              footer.innerHTML = global_footer_text;
+
+            }
+
+          });
+
+      };
+
+    
+
+      window.addEventListener("load", (event) => {
+
+        add_custom_footer();
+
+      });
+
+    </script>
+
+    
+
+    <script>
+
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+
+      // slide changes (different for each slide format).
+
+      (function () {
+
+        // dispatch for htmlwidgets
+
+        function fireSlideEnter() {
+
+          const event = window.document.createEvent("Event");
+
+          event.initEvent("slideenter", true, true);
+
+          window.document.dispatchEvent(event);
+
+        }
+
+    
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+
+          fireSlideEnter();
+
+    
+
+          // dispatch for shiny
+
+          if (window.jQuery) {
+
+            if (previousSlide) {
+
+              window.jQuery(previousSlide).trigger("hidden");
+
+            }
+
+            if (currentSlide) {
+
+              window.jQuery(currentSlide).trigger("shown");
+
+            }
+
+          }
+
+        }
+
+    
+
+        // hookup for slidy
+
+        if (window.w3c_slidy) {
+
+          window.w3c_slidy.add_observer(function (slide_num) {
+
+            // slide_num starts at position 1
+
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+
+          });
+
+        }
+
+    
+
+      })();
+
+    </script>
+
+    
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copiada");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copiada");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
