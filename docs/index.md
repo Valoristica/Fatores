@@ -1,6 +1,6 @@
 ## Sobre o curso
 
-O objetivo desde curso é promiver a capacitação de avaliadores na derivação e 
+O objetivo desde curso é promover a capacitação de avaliadores na derivação e 
 utilização racional de fatores de homogeneização, de acordo com o estabelecido
 nas normas técnicas de avaliações imobiliárias (NBR 14.653-01 a NBR 14.653-03).
 
