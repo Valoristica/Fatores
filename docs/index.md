@@ -22,6 +22,10 @@ nas normas técnicas de avaliações imobiliárias (NBR 14.653-01 a NBR 14.653-0
 - Através do site: [Curso de Fatores](http://www.valoristica.com.br/inscricoes/cursos/Fatores)
 - Vagas limitadas: 30
 
+### Conjuntos de dados
+
+- [Zilli (2020)](https://github.com/Valoristica/Fatores/raw/refs/heads/main/docs/data/Zilli.tsv) 
+
 ### Ementa
 
 #### Módulo 1
