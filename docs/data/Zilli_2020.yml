@@ -2,7 +2,7 @@
   git2rdata: 0.5.1
   optimize: yes
   NA string: NA
-  hash: a442871b655d7684e478b5c67ea79919802a677e
+  hash: a28ca14d99317e9b5ba490ec65dc4a9fcbfc43ef
   data_hash: 0904b5b8ec3e3b3b0390f98aa7ddaa1ddbc6c42c
 id:
   class: numeric
@@ -20,8 +20,8 @@ PC:
   class: factor
   labels:
   - Baixo
+  - Medio
   - Alto
-  - Médio
   index:
   - 1
   - 2
