@@ -1,0 +1,35 @@
+..generic:
+  git2rdata: 0.5.1
+  optimize: yes
+  NA string: NA
+  hash: 6f16ae45238dc66399d0f2d0b71255da024c5882
+  data_hash: d08003ba0130f8fc33b98b05c03263cea17ab7ab
+year:
+  class: integer
+age:
+  class: integer
+nbh:
+  class: integer
+cbd:
+  class: numeric
+  digits: 6
+inst:
+  class: numeric
+  digits: 6
+price:
+  class: numeric
+  digits: 6
+rooms:
+  class: integer
+area:
+  class: integer
+land:
+  class: numeric
+  digits: 6
+baths:
+  class: integer
+dist:
+  class: numeric
+  digits: 6
+y81:
+  class: integer
