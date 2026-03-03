@@ -24,7 +24,7 @@ nas normas técnicas de avaliações imobiliárias (NBR 14.653-01 a NBR 14.653-0
 
 ### Conjuntos de dados
 
-- [Zilli (2020)](https://github.com/Valoristica/Fatores/raw/refs/heads/main/docs/data/Zilli.tsv) 
+- [Zilli (2020)](https://github.com/Valoristica/Fatores/blob/main/docs/data/Zilli_2020.tsv) 
 
 ### Ementa
 
