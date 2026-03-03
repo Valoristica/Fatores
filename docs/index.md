@@ -26,6 +26,7 @@ nas normas técnicas de avaliações imobiliárias (NBR 14.653-01 a NBR 14.653-0
 
 - [Zilli (2020)](https://raw.githubusercontent.com/Valoristica/Fatores/refs/heads/main/docs/data/Zilli_2020.tsv) 
 - [Zeni (2024)](https://raw.githubusercontent.com/Valoristica/Fatores/refs/heads/main/docs/data/Zeni_2024.tsv)
+- [Wooldridge](https://raw.githubusercontent.com/Valoristica/Fatores/refs/heads/main/docs/data/hprice3.tsv)
 
 ### Ementa
 
