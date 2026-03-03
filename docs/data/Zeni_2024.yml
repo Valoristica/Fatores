@@ -1,0 +1,18 @@
+..generic:
+  git2rdata: 0.5.1
+  optimize: yes
+  NA string: NA
+  hash: 0221e2bff4b6da2b1d15b825e490afd8227ddcda
+  data_hash: ae5207eb39e062034a3b759bc495fad120d74eff
+Id:
+  class: numeric
+  digits: 6
+A:
+  class: numeric
+  digits: 6
+D:
+  class: numeric
+  digits: 6
+PU:
+  class: numeric
+  digits: 6
