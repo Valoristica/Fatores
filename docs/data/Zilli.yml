@@ -1,0 +1,61 @@
+..generic:
+  git2rdata: 0.5.1
+  optimize: yes
+  NA string: NA
+  hash: 3e8dd2fb3eb76276d60beae712f01701f265745f
+  data_hash: 1b1be5625271f546ac255b1c7cf58d3d1829ee8b
+id:
+  class: numeric
+  digits: 6
+PT:
+  class: numeric
+  digits: 6
+PU:
+  class: numeric
+  digits: 6
+AP:
+  class: numeric
+  digits: 6
+PC:
+  class: character
+NG:
+  class: numeric
+  digits: 6
+NB:
+  class: numeric
+  digits: 6
+ND:
+  class: numeric
+  digits: 6
+NS:
+  class: numeric
+  digits: 6
+MO:
+  class: character
+PSN:
+  class: character
+CH:
+  class: character
+DABM:
+  class: numeric
+  digits: 6
+DSBM:
+  class: numeric
+  digits: 6
+DSIG:
+  class: numeric
+  digits: 6
+DPXV:
+  class: numeric
+  digits: 6
+DCTC:
+  class: numeric
+  digits: 6
+BRO:
+  class: character
+COORD_E:
+  class: numeric
+  digits: 6
+COORD_N:
+  class: numeric
+  digits: 6
